@@ -46,7 +46,7 @@ jobs:
           docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 \
             git /repo --config /repo/.gitleaks.toml --redact \
             --report-format sarif --report-path /repo/gitleaks.sarif
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: gitleaks, path: gitleaks.sarif }
 
@@ -76,7 +76,7 @@ jobs:
         run: npx jest --ci --coverage --coverageThreshold='{"global":{"lines":80}}' --reporters=default --reporters=jest-junit
       - name: Build frontend
         run: npm run build --prefix FRONTEND
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: unitarias
@@ -110,7 +110,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v5
         with:
           args: -Dsonar.qualitygate.wait=true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: sast, path: semgrep.sarif }
 
@@ -144,7 +144,7 @@ jobs:
       - name: Logs del backend (diagnostico)
         if: failure()
         run: docker compose logs atlas-backend --tail 200
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: integracion
@@ -186,7 +186,7 @@ jobs:
                 -config replacer.full_list(0).regex=false -config replacer.full_list(0).replacement=Bearer\ $ZAP_TOKEN"
       - name: Quality gate (bloquea Alto y Medio no aceptado)
         run: node ev3/automatizacion/zap/zap-gate.mjs zap/zap-baseline-frontend.json zap/zap-api-backend.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: zap, path: zap/ }
 
@@ -207,7 +207,7 @@ jobs:
         run: |
           docker run --rm --network atlas-network -v "$PWD/ev3/automatizacion/carga:/scripts" -v "$PWD:/out" \
             grafana/k6 run --summary-export=/out/k6-summary.json /scripts/atlas-carga.k6.js
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: k6, path: k6-summary.json }
 

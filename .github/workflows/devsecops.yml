@@ -107,7 +107,7 @@ jobs:
           npm audit --prefix FRONTEND --omit=dev --audit-level=high
       - name: SonarQube (Quality Gate; se omite si no hay servidor configurado)
         if: env.SONAR_TOKEN != ''
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v8
         with:
           args: -Dsonar.qualitygate.wait=true
       - uses: actions/upload-artifact@v4

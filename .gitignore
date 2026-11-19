@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Secretos y configuracion local (EV3 - hallazgo Gitleaks): usar .env.example
+.env
+**/.env
+!.env.example
+
+# Artefactos generados
+**/coverage/
+**/dist/
+**/junit.xml
+FRONTEND/dist/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+~$*

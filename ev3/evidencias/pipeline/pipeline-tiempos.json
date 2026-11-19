@@ -1,0 +1,13 @@
+[
+  {"etapa": "1 Secretos Gitleaks", "ms": 65296, "estado": "OK"},
+  {"etapa": "2a Lint frontend ESLint", "ms": 48427, "estado": "OK"},
+  {"etapa": "2b Unitarias Jest + cobertura 80", "ms": 50918, "estado": "OK"},
+  {"etapa": "3a SAST Semgrep (bloquea ERROR)", "ms": 174888, "estado": "OK"},
+  {"etapa": "3b SCA npm audit prod (bloquea High)", "ms": 42746, "estado": "OK"},
+  {"etapa": "4a API funcional + seguridad", "ms": 13783, "estado": "OK"},
+  {"etapa": "4b E2E Selenium", "ms": 42219, "estado": "OK"},
+  {"etapa": "5a DAST ZAP baseline frontend", "ms": 424750, "estado": "OK"},
+  {"etapa": "5b DAST ZAP API scan backend", "ms": 298283, "estado": "OK"},
+  {"etapa": "5c Gate ZAP (Alto/Medio no aceptado)", "ms": 300, "estado": "OK"},
+  {"etapa": "6 Carga y estres k6", "ms": 87800, "estado": "OK"}
+]

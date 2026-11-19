@@ -1,0 +1,48 @@
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{escenario:carga}
+    ✓ 'p(95)<300' p(95)=103.52ms
+
+    http_req_duration{escenario:estres}
+    ✓ 'p(95)<1000' p(95)=243.76ms
+
+    http_req_failed{escenario:carga}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_req_failed{escenario:estres}
+    ✓ 'rate<0.05' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 13722   159.348531/s
+    checks_succeeded...: 100.00% 13722 out of 13722
+    checks_failed......: 0.00%   0 out of 13722
+
+    ✓ clientes 200
+    ✓ dashboard 200
+
+    HTTP
+    http_req_duration..............: avg=47.47ms min=1.24ms med=9ms     p(90)=144.79ms p(95)=228.17ms max=605.92ms
+      { escenario:carga }..........: avg=25.39ms min=1.37ms med=6.43ms  p(90)=57.47ms  p(95)=103.52ms max=555.59ms
+      { escenario:estres }.........: avg=53.35ms min=1.24ms med=11.06ms p(90)=162.06ms p(95)=243.76ms max=605.92ms
+      { expected_response:true }...: avg=47.47ms min=1.24ms med=9ms     p(90)=144.79ms p(95)=228.17ms max=605.92ms
+    http_req_failed................: 0.00%  0 out of 13723
+      { escenario:carga }..........: 0.00%  0 out of 2890
+      { escenario:estres }.........: 0.00%  0 out of 10832
+    http_reqs......................: 13723  159.360144/s
+
+    EXECUTION
+    iteration_duration.............: avg=1.09s   min=1s     med=1.02s   p(90)=1.28s    p(95)=1.34s    max=1.65s   
+    iterations.....................: 6861   79.674265/s
+    vus............................: 1      min=0          max=199
+    vus_max........................: 200    min=200        max=200
+
+    NETWORK
+    data_received..................: 26 MB  301 kB/s
+    data_sent......................: 6.0 MB 69 kB/s
+
+
+

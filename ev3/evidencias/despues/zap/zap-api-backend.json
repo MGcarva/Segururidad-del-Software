@@ -1,0 +1,1101 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Tue, 17 Nov 2026 18:02:04",
+	"created": "2026-11-17T18:02:04.834645155Z",
+	"insights":[
+		{
+			"level": "Medium",
+			"reason": "Exceeded High",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "95"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "4"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "84"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.endpoint.ctype.text/html",
+			"description": "Percentage of endpoints with content type text/html",
+			"statistic": "15"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.endpoint.method.DELETE",
+			"description": "Percentage of endpoints with method DELETE",
+			"statistic": "14"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "44"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "27"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.endpoint.method.PUT",
+			"description": "Percentage of endpoints with method PUT",
+			"statistic": "14"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "85"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://atlas-backend:4000",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "1"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "http://atlas-backend:4000",
+			"@host": "atlas-backend",
+			"@port": "4000",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "100001",
+					"alertRef": "100001",
+					"alert": "Unexpected Content-Type was returned",
+					"name": "Unexpected Content-Type was returned",
+					"riskcode": "1",
+					"confidence": "3",
+					"riskdesc": "Low (High)",
+					"desc": "<p>A Content-Type of text/html was returned by the server.</p><p>This is not one of the types expected to be returned by an API.</p><p>Raised by the 'Alert on Unexpected Content Types' script</p>",
+					"instances":[ 
+						{
+							"id": "27",
+							"uri": "http://atlas-backend:4000/8786158350025595426",
+							"nodeName": "http:\/\/atlas-backend:4000\/8786158350025595426",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "6049",
+							"uri": "http://atlas-backend:4000/actuator/health",
+							"nodeName": "http:\/\/atlas-backend:4000\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "73",
+							"uri": "http://atlas-backend:4000/autenticacion",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "5406",
+							"uri": "http://atlas-backend:4000/autenticacion/",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "29",
+							"uri": "http://atlas-backend:4000/autenticacion/6689933495621036459",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion\/6689933495621036459",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "33",
+							"uri": "http://atlas-backend:4000/contratos/10/4797184375207715371",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10\/4797184375207715371",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "4031",
+							"uri": "http://atlas-backend:4000/computeMetadata/v1/",
+							"nodeName": "http:\/\/atlas-backend:4000\/computeMetadata\/v1\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "4002",
+							"uri": "http://atlas-backend:4000/latest/meta-data/",
+							"nodeName": "http:\/\/atlas-backend:4000\/latest\/meta-data\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "4222",
+							"uri": "http://atlas-backend:4000/metadata/instance",
+							"nodeName": "http:\/\/atlas-backend:4000\/metadata\/instance ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "4243",
+							"uri": "http://atlas-backend:4000/metadata/v1",
+							"nodeName": "http:\/\/atlas-backend:4000\/metadata\/v1 ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "4082",
+							"uri": "http://atlas-backend:4000/opc/v1/instance/",
+							"nodeName": "http:\/\/atlas-backend:4000\/opc\/v1\/instance\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "4132",
+							"uri": "http://atlas-backend:4000/opc/v2/instance/",
+							"nodeName": "http:\/\/atlas-backend:4000\/opc\/v2\/instance\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "4264",
+							"uri": "http://atlas-backend:4000/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/atlas-backend:4000\/openstack\/latest\/meta_data.json ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						}
+					],
+					"count": "13",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "49"
+				},
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 404 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "8",
+							"uri": "http://atlas-backend:4000/clientes/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5386",
+							"uri": "http://atlas-backend:4000/clientes/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/10\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "12",
+							"uri": "http://atlas-backend:4000/contratos/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5395",
+							"uri": "http://atlas-backend:4000/contratos/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "25",
+							"uri": "http://atlas-backend:4000/empresa-usuarios/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5389",
+							"uri": "http://atlas-backend:4000/empresa-usuarios/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios\/10\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "17",
+							"uri": "http://atlas-backend:4000/empresas/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5396",
+							"uri": "http://atlas-backend:4000/empresas/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas\/10\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "21",
+							"uri": "http://atlas-backend:4000/roles/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "5398",
+							"uri": "http://atlas-backend:4000/roles/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles\/10\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "http://atlas-backend:4000/usuarios/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5399",
+							"uri": "http://atlas-backend:4000/usuarios/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/10\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "26",
+							"uri": "http://atlas-backend:4000/8786158350025595426",
+							"nodeName": "http:\/\/atlas-backend:4000\/8786158350025595426",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "6048",
+							"uri": "http://atlas-backend:4000/actuator/health",
+							"nodeName": "http:\/\/atlas-backend:4000\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "72",
+							"uri": "http://atlas-backend:4000/autenticacion",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5405",
+							"uri": "http://atlas-backend:4000/autenticacion/",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "28",
+							"uri": "http://atlas-backend:4000/autenticacion/6689933495621036459",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion\/6689933495621036459",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "6",
+							"uri": "http://atlas-backend:4000/clientes/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5407",
+							"uri": "http://atlas-backend:4000/clientes/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/10\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "30",
+							"uri": "http://atlas-backend:4000/clientes/6423768067461377766",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/6423768067461377766",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "6047",
+							"uri": "http://atlas-backend:4000/clientes/search?name=%00",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/search (name)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "10",
+							"uri": "http://atlas-backend:4000/contratos/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5409",
+							"uri": "http://atlas-backend:4000/contratos/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "32",
+							"uri": "http://atlas-backend:4000/contratos/10/4797184375207715371",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10\/4797184375207715371",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "13",
+							"uri": "http://atlas-backend:4000/contratos/10/file",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10\/file",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5412",
+							"uri": "http://atlas-backend:4000/contratos/10/file/",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10\/file\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "31",
+							"uri": "http://atlas-backend:4000/contratos/2536210702378437212",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/2536210702378437212",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "23",
+							"uri": "http://atlas-backend:4000/empresa-usuarios/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5413",
+							"uri": "http://atlas-backend:4000/empresa-usuarios/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios\/10\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "34",
+							"uri": "http://atlas-backend:4000/empresa-usuarios/914079245519048638",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios\/914079245519048638",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "15",
+							"uri": "http://atlas-backend:4000/empresas/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5408",
+							"uri": "http://atlas-backend:4000/empresas/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas\/10\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "35",
+							"uri": "http://atlas-backend:4000/empresas/4253896359608828750",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas\/4253896359608828750",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "19",
+							"uri": "http://atlas-backend:4000/roles/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5411",
+							"uri": "http://atlas-backend:4000/roles/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles\/10\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "36",
+							"uri": "http://atlas-backend:4000/roles/3092773137438703266",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles\/3092773137438703266",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "http://atlas-backend:4000/usuarios/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5410",
+							"uri": "http://atlas-backend:4000/usuarios/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/10\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "37",
+							"uri": "http://atlas-backend:4000/usuarios/5264428158002132380",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/5264428158002132380",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "14",
+							"uri": "http://atlas-backend:4000/auditoria",
+							"nodeName": "http:\/\/atlas-backend:4000\/auditoria ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "5383",
+							"uri": "http://atlas-backend:4000/auditoria/",
+							"nodeName": "http:\/\/atlas-backend:4000\/auditoria\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://atlas-backend:4000/autenticacion/login",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion\/login ()({nombre_usuario,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "260",
+							"uri": "http://atlas-backend:4000/autenticacion/login",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion\/login ()({nombre_usuario,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "5384",
+							"uri": "http://atlas-backend:4000/autenticacion/login/",
+							"nodeName": "http:\/\/atlas-backend:4000\/autenticacion\/login\/ ()({nombre_usuario,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "5",
+							"uri": "http://atlas-backend:4000/clientes",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes ()({nombre,correo,telefono,direccion,es_empresa,nombre_banco,numero_cuenta,titular_cuenta})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "5388",
+							"uri": "http://atlas-backend:4000/clientes/",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/ ()({nombre,correo,telefono,direccion,es_empresa,nombre_banco,numero_cuenta,titular_cuenta})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "4030",
+							"uri": "http://atlas-backend:4000/computeMetadata/v1/",
+							"nodeName": "http:\/\/atlas-backend:4000\/computeMetadata\/v1\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "9",
+							"uri": "http://atlas-backend:4000/contratos",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos ()(multipart:cliente_id,titulo,descripcion,fecha_inicio,fecha_fin,file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "492",
+							"uri": "http://atlas-backend:4000/contratos",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos ()(multipart:cliente_id,titulo,descripcion,fecha_inicio,fecha_fin,file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5387",
+							"uri": "http://atlas-backend:4000/contratos/",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/ ()(multipart:cliente_id,titulo,descripcion,fecha_inicio,fecha_fin,file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "22",
+							"uri": "http://atlas-backend:4000/empresa-usuarios",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios ()({empresa_id,usuario_id,rol_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "5391",
+							"uri": "http://atlas-backend:4000/empresa-usuarios/",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios\/ ()({empresa_id,usuario_id,rol_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "48",
+							"uri": "http://atlas-backend:4000/empresas",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas ()({nombre,direccion,telefono,correo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "5402",
+							"uri": "http://atlas-backend:4000/empresas/",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas\/ ()({nombre,direccion,telefono,correo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "4001",
+							"uri": "http://atlas-backend:4000/latest/meta-data/",
+							"nodeName": "http:\/\/atlas-backend:4000\/latest\/meta-data\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "4221",
+							"uri": "http://atlas-backend:4000/metadata/instance",
+							"nodeName": "http:\/\/atlas-backend:4000\/metadata\/instance ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "4242",
+							"uri": "http://atlas-backend:4000/metadata/v1",
+							"nodeName": "http:\/\/atlas-backend:4000\/metadata\/v1 ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "4080",
+							"uri": "http://atlas-backend:4000/opc/v1/instance/",
+							"nodeName": "http:\/\/atlas-backend:4000\/opc\/v1\/instance\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "4131",
+							"uri": "http://atlas-backend:4000/opc/v2/instance/",
+							"nodeName": "http:\/\/atlas-backend:4000\/opc\/v2\/instance\/ ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "4263",
+							"uri": "http://atlas-backend:4000/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/atlas-backend:4000\/openstack\/latest\/meta_data.json ()({accion,detalles})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "18",
+							"uri": "http://atlas-backend:4000/roles",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles ()({nombre})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "5390",
+							"uri": "http://atlas-backend:4000/roles/",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles\/ ()({nombre})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "http://atlas-backend:4000/usuarios",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios ()({nombre_usuario,contrasena_hash,correo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "5400",
+							"uri": "http://atlas-backend:4000/usuarios/",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/ ()({nombre_usuario,contrasena_hash,correo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "7",
+							"uri": "http://atlas-backend:4000/clientes/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/10 ()({nombre,correo,telefono,direccion,es_empresa,nombre_banco,numero_cuenta,titular_cuenta})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "5385",
+							"uri": "http://atlas-backend:4000/clientes/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes\/10\/ ()({nombre,correo,telefono,direccion,es_empresa,nombre_banco,numero_cuenta,titular_cuenta})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "11",
+							"uri": "http://atlas-backend:4000/contratos/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10 ()({cliente_id,titulo,descripcion,fecha_inicio,fecha_fin})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5394",
+							"uri": "http://atlas-backend:4000/contratos/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/contratos\/10\/ ()({cliente_id,titulo,descripcion,fecha_inicio,fecha_fin})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "24",
+							"uri": "http://atlas-backend:4000/empresa-usuarios/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios\/10 ()({empresa_id,usuario_id,rol_id})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "5392",
+							"uri": "http://atlas-backend:4000/empresa-usuarios/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresa-usuarios\/10\/ ()({empresa_id,usuario_id,rol_id})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "16",
+							"uri": "http://atlas-backend:4000/empresas/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas\/10 ()({nombre,direccion,telefono,correo})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5393",
+							"uri": "http://atlas-backend:4000/empresas/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/empresas\/10\/ ()({nombre,direccion,telefono,correo})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "20",
+							"uri": "http://atlas-backend:4000/roles/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles\/10 ()({nombre})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "5397",
+							"uri": "http://atlas-backend:4000/roles/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/roles\/10\/ ()({nombre})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "3",
+							"uri": "http://atlas-backend:4000/usuarios/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/10 ()({nombre_usuario,contrasena_hash,correo})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "5401",
+							"uri": "http://atlas-backend:4000/usuarios/10/",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/10\/ ()({nombre_usuario,contrasena_hash,correo})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						}
+					],
+					"count": "76",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "17"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "320",
+							"uri": "http://atlas-backend:4000/clientes",
+							"nodeName": "http:\/\/atlas-backend:4000\/clientes",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "309",
+							"uri": "http://atlas-backend:4000/usuarios",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "310",
+							"uri": "http://atlas-backend:4000/usuarios/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "308",
+							"uri": "http://atlas-backend:4000/usuarios",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios ()({nombre_usuario,contrasena_hash,correo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "295",
+							"uri": "http://atlas-backend:4000/usuarios/10",
+							"nodeName": "http:\/\/atlas-backend:4000\/usuarios\/10 ()({nombre_usuario,contrasena_hash,correo})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "PUT ",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "11"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

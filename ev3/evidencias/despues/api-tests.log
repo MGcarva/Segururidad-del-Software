@@ -1,0 +1,45 @@
+▶ Pruebas funcionales (regresion de requerimientos)
+  ✔ FUN-01 [RF-1.1] Login con credenciales validas entrega un JWT (158.3952ms)
+  ✔ FUN-02 [RF-3.1] Administrador crea un cliente en su empresa (23.4971ms)
+  ✔ FUN-03 [RF-3.2] El listado de clientes solo contiene clientes propios (13.1499ms)
+  ✔ FUN-04 [RF-4.1] Administrador crea un contrato para su propio cliente (17.1646ms)
+  ✔ FUN-05 [RF-6.1] Dashboard entrega metricas numericas de la empresa (29.5277ms)
+  ✔ FUN-06 [RF-5.1] Las acciones quedan registradas en auditoria (14.1296ms)
+✔ Pruebas funcionales (regresion de requerimientos) (1434.2228ms)
+▶ Pruebas de seguridad - Autenticacion (OWASP A07)
+  ✔ SEC-01 Credenciales invalidas devuelven 401 con mensaje generico (98.6845ms)
+  ✔ SEC-02 Inyeccion SQL en el login no permite el acceso (OWASP A03) (33.9842ms)
+  ✔ SEC-03 Endpoints protegidos rechazan peticiones sin token (33.6167ms)
+  ✔ SEC-04 Un JWT con firma alterada es rechazado (5.3838ms)
+  ✔ SEC-05 El token queda revocado despues del logout (175.6008ms)
+  ✔ SEC-06 Bloqueo por fuerza bruta: el login se limita tras intentos fallidos (120.3667ms)
+  ✔ SEC-07 Politica de contrasena robusta en el registro (NFR-SEG, min. 12 caracteres) (5.5042ms)
+✔ Pruebas de seguridad - Autenticacion (OWASP A07) (474.8294ms)
+▶ Pruebas de seguridad - Control de acceso (OWASP A01)
+  ✔ SEC-08 Rol editor no puede escribir (403) (7.8619ms)
+  ✔ SEC-09 IDOR: no se puede leer un cliente de otra empresa (6.6816ms)
+  ✔ SEC-10 IDOR: no se puede crear un contrato sobre un cliente de otra empresa (10.4192ms)
+  ✔ SEC-11 IDOR: no se puede modificar un usuario de otra empresa (9.2097ms)
+  ✔ SEC-12 IDOR: no se puede eliminar un usuario de otra empresa (8.764ms)
+  ✔ SEC-13 El registro de auditoria esta aislado por empresa (Ley 21.719) (5.2809ms)
+  ✔ SEC-14 No se puede vincular a la empresa propia un usuario de otra empresa (9.1157ms)
+✔ Pruebas de seguridad - Control de acceso (OWASP A01) (58.2138ms)
+▶ Pruebas de seguridad - Configuracion (OWASP A05)
+  ✔ SEC-15 La API envia cabeceras de seguridad HTTP (5.8506ms)
+  ✔ SEC-16 La API no revela la tecnologia del servidor (X-Powered-By) (5.8387ms)
+  ✔ SEC-17 Los errores no exponen detalles internos de la base de datos (7.9223ms)
+  ✔ SEC-18 CORS no acepta origenes arbitrarios (9.3193ms)
+✔ Pruebas de seguridad - Configuracion (OWASP A05) (29.8697ms)
+▶ Pruebas de seguridad - Validacion e integridad (OWASP A03/A04)
+  ✔ SEC-19 El backend rechaza datos de cliente invalidos (validacion server-side) (5.4263ms)
+  ✔ SEC-21 Nadie puede insertar entradas arbitrarias en la auditoria (Ley 21.663) (4.5111ms)
+  ✔ SEC-20 Un administrador de empresa no puede alterar el catalogo global de roles (8.433ms)
+✔ Pruebas de seguridad - Validacion e integridad (OWASP A03/A04) (19.0103ms)
+ℹ tests 27
+ℹ suites 5
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2350.2626

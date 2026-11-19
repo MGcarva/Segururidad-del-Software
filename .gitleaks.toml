@@ -1,0 +1,13 @@
+# Configuracion de Gitleaks (EV3). Extiende las reglas por defecto y excluye
+# rutas revisadas manualmente que no contienen credenciales reales.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Falsos positivos revisados"
+paths = [
+  '''documentos/SonarQube_Reporte_Issues_Atlas\.json''',  # ids de issues de SonarQube
+  '''ev3/evidencias/''',                                    # reportes generados por las herramientas
+  '''node_modules/''',
+  '''\.env\.example''',
+]

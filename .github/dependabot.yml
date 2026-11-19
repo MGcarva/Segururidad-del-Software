@@ -1,0 +1,26 @@
+# Mantenimiento preventivo automatizado de dependencias (plan de mantenimiento EV3).
+# Dependabot abre PR semanales; cada PR pasa por el pipeline DevSecOps completo
+# antes de poder fusionarse, por lo que una actualizacion nunca entra sin pruebas.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /BACKEND
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      parches-backend: { update-types: [patch, minor] }
+  - package-ecosystem: npm
+    directory: /FRONTEND
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      parches-frontend: { update-types: [patch, minor] }
+  - package-ecosystem: docker
+    directory: /BACKEND
+    schedule: { interval: monthly }
+  - package-ecosystem: docker
+    directory: /FRONTEND
+    schedule: { interval: monthly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }

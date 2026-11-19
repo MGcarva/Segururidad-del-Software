@@ -1,0 +1,14 @@
+# Scripts y configuracion que se ejecutan en Linux (contenedores y CI): siempre LF.
+*.sh        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.toml      text eol=lf
+Dockerfile  text eol=lf
+*.conf      text eol=lf
+*.sql       text eol=lf
+# Binarios
+*.png binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.pptx binary

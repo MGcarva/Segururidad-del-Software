@@ -1,0 +1,27 @@
+
+# zap-baseline-frontend.json
+  [MEDIO] Content Security Policy (CSP) Header Not Set (10038) x1 -> BLOQUEA
+  [MEDIO] Missing Anti-clickjacking Header (10020) x1 -> BLOQUEA
+  [MEDIO] Sub Resource Integrity Attribute Missing (90003) x2 -> aceptado: Hojas de estilo de Google Fonts (contenido dinamico, no admite SRI). Mitigacion planificada: alojar las fuentes localmente.
+  [BAJO ] Cross-Origin-Embedder-Policy Header Missing or Invalid (90004) x1 -> ok
+  [BAJO ] Cross-Origin-Opener-Policy Header Missing or Invalid (90004) x1 -> ok
+  [BAJO ] Cross-Origin-Resource-Policy Header Missing or Invalid (90004) x1 -> ok
+  [BAJO ] Permissions Policy Header Not Set (10063) x1 -> ok
+  [BAJO ] Server Leaks Version Information via "Server" HTTP Response Header Field (10036) x1 -> ok
+  [BAJO ] X-Content-Type-Options Header Missing (10021) x1 -> ok
+  [INFO ] Modern Web Application (10109) x1 -> ok
+  [INFO ] Storable and Cacheable Content (10049) x1 -> ok
+
+# zap-api-backend.json
+  [ALTO ] SQL Injection (40018) x1 -> BLOQUEA
+  [MEDIO] Cross-Domain Misconfiguration (10098) x5 -> BLOQUEA
+  [MEDIO] Format String Error (30002) x1 -> BLOQUEA
+  [BAJO ] A Server Error response code was returned by the server (100000) x11 -> ok
+  [BAJO ] Application Error Disclosure (90022) x1 -> ok
+  [BAJO ] Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s) (10037) x5 -> ok
+  [BAJO ] Unexpected Content-Type was returned (100001) x14 -> ok
+  [BAJO ] X-Content-Type-Options Header Missing (10021) x5 -> ok
+  [INFO ] A Client Error response code was returned by the server (100000) x61 -> ok
+  [INFO ] Non-Storable Content (10049) x5 -> ok
+
+Resultado del gate: RECHAZADO (5 alerta(s) bloqueante(s))

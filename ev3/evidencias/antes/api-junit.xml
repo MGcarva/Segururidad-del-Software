@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testsuite name="Pruebas funcionales (regresion de requerimientos)" time="0.789269" disabled="0" errors="0" tests="6" failures="0" skipped="0" hostname="DESKTOP-OLVR29N">
+		<testcase name="FUN-01 [RF-1.1] Login con credenciales validas entrega un JWT" time="0.076952" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="FUN-02 [RF-3.1] Administrador crea un cliente en su empresa" time="0.017465" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="FUN-03 [RF-3.2] El listado de clientes solo contiene clientes propios" time="0.011287" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="FUN-04 [RF-4.1] Administrador crea un contrato para su propio cliente" time="0.017055" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="FUN-05 [RF-6.1] Dashboard entrega metricas numericas de la empresa" time="0.009850" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="FUN-06 [RF-5.1] Las acciones quedan registradas en auditoria" time="0.036619" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+	</testsuite>
+	<testsuite name="Pruebas de seguridad - Autenticacion (OWASP A07)" time="0.488428" disabled="0" errors="0" tests="7" failures="2" skipped="0" hostname="DESKTOP-OLVR29N">
+		<testcase name="SEC-01 Credenciales invalidas devuelven 401 con mensaje generico" time="0.059946" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="SEC-02 Inyeccion SQL en el login no permite el acceso (OWASP A03)" time="0.028983" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="SEC-03 Endpoints protegidos rechazan peticiones sin token" time="0.062344" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="SEC-04 Un JWT con firma alterada es rechazado" time="0.017109" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="SEC-05 El token queda revocado despues del logout" time="0.107411" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="SEC-06 Bloqueo por fuerza bruta: el login se limita tras intentos fallidos" time="0.115839" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="no hubo bloqueo; estados: 401,401,401,401,401,401,401,401">
+			<failure type="testCodeFailure" message="no hubo bloqueo; estados: 401,401,401,401,401,401,401,401">
+[Error [ERR_TEST_FAILURE]: no hubo bloqueo; estados: 401,401,401,401,401,401,401,401] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: no hubo bloqueo; estados: 401,401,401,401,401,401,401,401
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:166:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-07 Politica de contrasena robusta en el registro (NFR-SEG, min. 12 caracteres)" time="0.095381" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="se acepto la contrasena '123' (status 201)&#10;&#10;201 !== 400&#10;">
+			<failure type="testCodeFailure" message="se acepto la contrasena '123' (status 201)&#10;&#10;201 !== 400">
+[Error [ERR_TEST_FAILURE]: se acepto la contrasena '123' (status 201)
+
+201 !== 400
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: se acepto la contrasena '123' (status 201)
+  
+  201 !== 400
+  
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:176:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+	</testsuite>
+	<testsuite name="Pruebas de seguridad - Control de acceso (OWASP A01)" time="0.190349" disabled="0" errors="0" tests="7" failures="5" skipped="0" hostname="DESKTOP-OLVR29N">
+		<testcase name="SEC-08 Rol editor no puede escribir (403)" time="0.005656" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="SEC-09 IDOR: no se puede leer un cliente de otra empresa" time="0.004323" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs"/>
+		<testcase name="SEC-10 IDOR: no se puede crear un contrato sobre un cliente de otra empresa" time="0.016983" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="contrato creado sobre cliente ajeno (status 201)">
+			<failure type="testCodeFailure" message="contrato creado sobre cliente ajeno (status 201)">
+[Error [ERR_TEST_FAILURE]: contrato creado sobre cliente ajeno (status 201)] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: contrato creado sobre cliente ajeno (status 201)
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:196:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-11 IDOR: no se puede modificar un usuario de otra empresa" time="0.080927" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="usuario ajeno modificado (status 200)&#10;&#10;200 !== 404&#10;">
+			<failure type="testCodeFailure" message="usuario ajeno modificado (status 200)&#10;&#10;200 !== 404">
+[Error [ERR_TEST_FAILURE]: usuario ajeno modificado (status 200)
+
+200 !== 404
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: usuario ajeno modificado (status 200)
+  
+  200 !== 404
+  
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:204:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 404,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-12 IDOR: no se puede eliminar un usuario de otra empresa" time="0.006078" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="usuario ajeno eliminado (status 500)&#10;&#10;500 !== 404&#10;">
+			<failure type="testCodeFailure" message="usuario ajeno eliminado (status 500)&#10;&#10;500 !== 404">
+[Error [ERR_TEST_FAILURE]: usuario ajeno eliminado (status 500)
+
+500 !== 404
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: usuario ajeno eliminado (status 500)
+  
+  500 !== 404
+  
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:209:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 404,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-13 El registro de auditoria esta aislado por empresa (Ley 21.719)" time="0.049876" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="se exponen 3 registros de la empresa B&#10;&#10;3 !== 0&#10;">
+			<failure type="testCodeFailure" message="se exponen 3 registros de la empresa B&#10;&#10;3 !== 0">
+[Error [ERR_TEST_FAILURE]: se exponen 3 registros de la empresa B
+
+3 !== 0
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: se exponen 3 registros de la empresa B
+  
+  3 !== 0
+  
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:216:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-14 No se puede vincular a la empresa propia un usuario de otra empresa" time="0.025782" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="vinculo cruzado creado (status 201)">
+			<failure type="testCodeFailure" message="vinculo cruzado creado (status 201)">
+[Error [ERR_TEST_FAILURE]: vinculo cruzado creado (status 201)] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: vinculo cruzado creado (status 201)
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:221:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+	</testsuite>
+	<testsuite name="Pruebas de seguridad - Configuracion (OWASP A05)" time="0.018820" disabled="0" errors="0" tests="4" failures="4" skipped="0" hostname="DESKTOP-OLVR29N">
+		<testcase name="SEC-15 La API envia cabeceras de seguridad HTTP" time="0.004087" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="Expected values to be strictly equal:&#10;&#10;null !== 'nosniff'&#10;">
+			<failure type="testCodeFailure" message="Expected values to be strictly equal:&#10;&#10;null !== 'nosniff'">
+Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
+
+null !== 'nosniff'
+
+    at async Promise.all (index 0) {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  null !== 'nosniff'
+  
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:228:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1794:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'nosniff',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-16 La API no revela la tecnologia del servidor (X-Powered-By)" time="0.002966" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="Expected values to be strictly equal:&#10;&#10;'Express' !== null&#10;">
+			<failure type="testCodeFailure" message="Expected values to be strictly equal:&#10;&#10;'Express' !== null">
+[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:
+
+'Express' !== null
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'Express' !== null
+  
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:235:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Express',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-17 Los errores no exponen detalles internos de la base de datos" time="0.007741" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="fuga de detalle interno: {&amp;quot;error&amp;quot;:&amp;quot;Error al obtener contrato&amp;quot;,&amp;quot;glosa&amp;quot;:&amp;quot;invalid input syntax for type bigint: \&amp;quot;no-numerico\&amp;quot;&amp;quot;}">
+			<failure type="testCodeFailure" message="fuga de detalle interno: {&amp;quot;error&amp;quot;:&amp;quot;Error al obtener contrato&amp;quot;,&amp;quot;glosa&amp;quot;:&amp;quot;invalid input syntax for type bigint: \&amp;quot;no-numerico\&amp;quot;&amp;quot;}">
+[Error [ERR_TEST_FAILURE]: fuga de detalle interno: {"error":"Error al obtener contrato","glosa":"invalid input syntax for type bigint: \"no-numerico\""}] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: fuga de detalle interno: {"error":"Error al obtener contrato","glosa":"invalid input syntax for type bigint: \"no-numerico\""}
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:241:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-18 CORS no acepta origenes arbitrarios" time="0.003341" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="CORS permite: *">
+			<failure type="testCodeFailure" message="CORS permite: *">
+[Error [ERR_TEST_FAILURE]: CORS permite: *] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: CORS permite: *
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:247:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+	</testsuite>
+	<testsuite name="Pruebas de seguridad - Validacion e integridad (OWASP A03/A04)" time="0.050253" disabled="0" errors="0" tests="2" failures="2" skipped="0" hostname="DESKTOP-OLVR29N">
+		<testcase name="SEC-19 El backend rechaza datos de cliente invalidos (validacion server-side)" time="0.026409" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="se almaceno un correo invalido (status 201)&#10;&#10;201 !== 400&#10;">
+			<failure type="testCodeFailure" message="se almaceno un correo invalido (status 201)&#10;&#10;201 !== 400">
+Error [ERR_TEST_FAILURE]: se almaceno un correo invalido (status 201)
+
+201 !== 400
+
+    at async Promise.all (index 0) {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: se almaceno un correo invalido (status 201)
+  
+  201 !== 400
+  
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:257:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1794:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+		<testcase name="SEC-20 Un administrador de empresa no puede alterar el catalogo global de roles" time="0.023513" classname="test" file="C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\ev3\automatizacion\api\atlas-api.test.mjs" failure="rol global creado por un tenant (status 201)&#10;&#10;201 !== 403&#10;">
+			<failure type="testCodeFailure" message="rol global creado por un tenant (status 201)&#10;&#10;201 !== 403">
+[Error [ERR_TEST_FAILURE]: rol global creado por un tenant (status 201)
+
+201 !== 403
+] {
+  code: 'ERR_TEST_FAILURE',
+  failureType: 'testCodeFailure',
+  cause: AssertionError [ERR_ASSERTION]: rol global creado por un tenant (status 201)
+  
+  201 !== 403
+  
+      at TestContext.&lt;anonymous> (file:///C:/Users/LENOVO/Downloads/CodigoFuenteA/CodigoFuenteA/ev3/automatizacion/api/atlas-api.test.mjs:262:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 403,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+}
+			</failure>
+		</testcase>
+	</testsuite>
+	<!-- tests 26 -->
+	<!-- suites 5 -->
+	<!-- pass 13 -->
+	<!-- fail 13 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 0 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 1690.149 -->
+</testsuites>

@@ -1,0 +1,119 @@
+18:13:07.012 INFO  Scanner configuration file: /opt/sonar-scanner/conf/sonar-scanner.properties
+18:13:07.021 INFO  Project root configuration file: NONE
+18:13:07.052 INFO  SonarScanner CLI 8.1.0.6389
+18:13:07.058 INFO  Linux 6.18.33.1-microsoft-standard-WSL2 amd64
+18:13:09.009 INFO  Communicating with SonarQube Community Build 26.10.0.133078
+18:13:09.010 INFO  JRE provisioning: os[linux], arch[x86_64]
+18:13:19.103 INFO  Starting SonarScanner Engine...
+18:13:19.104 INFO  Java 21.0.12.1 Eclipse Adoptium (64-bit)
+18:13:21.206 INFO  Load global settings
+18:13:21.409 INFO  Load global settings (done) | time=201ms
+18:13:21.414 INFO  Server id: 147B411E-AaHqtT4ndi1YyvGxT5Uj
+18:13:21.427 INFO  Loading required plugins
+18:13:21.428 INFO  Load plugins index
+18:13:21.476 INFO  Load plugins index (done) | time=48ms
+18:13:21.477 INFO  Load/download plugins
+18:13:23.556 INFO  Load/download plugins (done) | time=2079ms
+18:13:23.973 INFO  Load project settings for component key: 'atlas-antes'
+18:13:24.013 INFO  Process project properties
+18:13:24.042 INFO  Process project properties (done) | time=28ms
+18:13:24.061 INFO  Project key: atlas-antes
+18:13:24.061 INFO  Base dir: /usr/src
+18:13:24.062 INFO  Working dir: /tmp/.scannerwork
+18:13:24.143 INFO  Load quality profiles
+18:13:24.286 INFO  Load quality profiles (done) | time=142ms
+18:13:24.379 INFO  Load active rules
+18:13:25.088 INFO  Load active rules (done) | time=710ms
+18:13:25.103 INFO  Load analysis cache
+18:13:25.122 INFO  Load analysis cache (404) | time=21ms
+18:13:25.264 INFO  Preprocessing files...
+18:13:25.839 INFO  3 languages detected in 49 preprocessed files (done) | time=574ms
+18:13:25.840 INFO  0 files ignored because of inclusion/exclusion patterns
+18:13:25.842 INFO  Loading plugins for detected languages
+18:13:25.844 INFO  Load/download plugins
+18:13:34.602 INFO  Load/download plugins (done) | time=8758ms
+18:13:34.891 INFO  Load project repositories
+18:13:34.908 INFO  Load project repositories (done) | time=17ms
+18:13:34.955 INFO  Indexing files...
+18:13:34.956 INFO  Project configuration:
+18:13:34.959 INFO    Excluded sources: **/node_modules/**, **/dist/**
+18:13:35.409 INFO  49 files indexed (done) | time=453ms
+18:13:35.411 INFO  Quality profile for css: Sonar way core
+18:13:35.411 INFO  Quality profile for js: Sonar way core
+18:13:35.411 INFO  Quality profile for json: Sonar way comprehensive
+18:13:35.412 INFO  ------------- Run sensors on module Atlas antes
+18:13:35.475 INFO  Load metrics repository
+18:13:35.520 INFO  Load metrics repository (done) | time=45ms
+18:13:35.992 INFO  Reflections took 102 ms to scan 1 urls, producing 30 keys and 303 values
+18:13:36.144 INFO  Sensor IaC YAML File Type Classification Sensor [iac]
+18:13:36.205 INFO  Sensor IaC YAML File Type Classification Sensor [iac] (done) | time=61ms
+18:13:36.206 INFO  Sensor IaC CloudFormation Sensor [iac]
+18:13:36.208 INFO  There are no files to be analyzed for the CloudFormation language
+18:13:36.209 INFO  Sensor IaC CloudFormation Sensor [iac] (done) | time=2ms
+18:13:36.209 INFO  Sensor IaC cfn-lint report Sensor [iac]
+18:13:36.210 INFO  Sensor IaC cfn-lint report Sensor [iac] (done) | time=1ms
+18:13:36.217 INFO  Sensor IaC hadolint report Sensor [iac]
+18:13:36.222 INFO  Sensor IaC hadolint report Sensor [iac] (done) | time=0ms
+18:13:36.224 INFO  Sensor IaC Azure Resource Manager Sensor [iac]
+18:13:36.224 INFO  There are no files to be analyzed for the Azure Resource Manager language
+18:13:36.224 INFO  Sensor IaC Azure Resource Manager Sensor [iac] (done) | time=1ms
+18:13:36.226 INFO  Sensor Java Config Sensor [iac]
+18:13:36.226 INFO  There are no files to be analyzed for the Java language
+18:13:36.227 INFO  Sensor Java Config Sensor [iac] (done) | time=0ms
+18:13:36.227 INFO  Sensor IaC Docker Sensor [iac]
+18:13:36.229 INFO  There are no files to be analyzed for the Docker language
+18:13:36.230 INFO  Sensor IaC Docker Sensor [iac] (done) | time=16ms
+18:13:36.230 INFO  Sensor HTML [web]
+18:13:36.254 INFO  Sensor HTML [web] (done) | time=23ms
+18:13:36.254 INFO  Sensor TextAndSecretsSensor [text]
+18:13:36.314 INFO  Available processors: 8
+18:13:36.315 INFO  Using 8 threads for analysis.
+18:13:36.943 INFO  The property "sonar.tests" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:
+  * The filename starts with "test"
+  * The filename contains "test." or "tests."
+  * Any directory in the file path is named: "doc", "docs", "test", "tests", "mock" or "mocks"
+  * Any directory in the file path has a name ending in "test" or "tests"
+
+18:13:36.980 INFO  Start fetching files for the text and secrets analysis
+18:13:37.012 INFO  Using Git CLI to retrieve dirty files
+18:13:37.018 WARN  Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via "sonar.text.inclusions"
+18:13:37.019 INFO  Starting the text and secrets analysis
+18:13:37.021 INFO  45 source files to be analyzed for the text and secrets analysis
+18:13:37.487 INFO  45/45 source files have been analyzed for the text and secrets analysis
+18:13:37.491 INFO  Sensor TextAndSecretsSensor [text] (done) | time=1238ms
+18:13:37.496 INFO  ------------- Run sensors on project
+18:13:37.804 INFO  Sensor JavaScript/TypeScript/CSS analysis [javascript]
+18:13:38.166 INFO  Detected os: Linux arch: amd64 alpine: false. Platform: LINUX_X64
+18:13:38.166 INFO  Deploy location /opt/sonar-scanner/.sonar/js/node-runtime, tagetRuntime: /opt/sonar-scanner/.sonar/js/node-runtime/node,  version: /opt/sonar-scanner/.sonar/js/node-runtime/version.txt
+18:13:41.763 INFO  Using embedded Node.js runtime.
+18:13:41.764 INFO  Using Node.js executable: '/opt/sonar-scanner/.sonar/js/node-runtime/node'.
+18:13:45.848 INFO  Memory configuration: OS (7769 MB), Node.js (2240 MB).
+18:13:45.928 INFO  gRPC analyze-project server listening on 127.0.0.1:33799
+18:13:46.773 INFO  Plugin version: [14.0.0.46108]
+18:13:51.459 INFO  Found 0 tsconfig.json file(s): []
+18:16:34.535 INFO  44 source files to be analyzed
+18:16:34.536 INFO  Analyzing 42 file(s) using default options [lib: lib.esnext.d.ts, lib.dom.d.ts]
+18:16:34.538 INFO  44/44 source files have been analyzed
+18:16:34.553 INFO  Hit the cache for 0 out of 42
+18:16:34.554 INFO  Miss the cache for 42 out of 42: ANALYSIS_MODE_INELIGIBLE [42/42]
+18:16:34.554 INFO  Sensor JavaScript/TypeScript/CSS analysis [javascript] (done) | time=176749ms
+18:16:34.555 INFO  Sensor IaC Project Sensor [iac]
+18:16:34.557 INFO  Sensor IaC Project Sensor [iac] (done) | time=2ms
+18:16:34.558 INFO  Sensor Zero Coverage Sensor
+18:16:34.587 INFO  Sensor Zero Coverage Sensor (done) | time=30ms
+18:16:34.588 INFO  ------------- Gather SCA dependencies on project
+18:16:34.606 INFO  Dependency analysis skipped
+18:16:34.610 INFO  SCM Publisher is disabled
+18:16:34.629 INFO  CPD Executor 6 files had no CPD blocks
+18:16:34.630 INFO  CPD Executor Calculating CPD for 38 files
+18:16:34.736 INFO  CPD Executor CPD calculation finished (done) | time=106ms
+18:16:35.455 INFO  Analysis report generated in 678ms, dir size=808.4 kB
+18:16:35.580 INFO  Analysis report compressed in 126ms, zip size=407.2 kB
+18:16:36.104 INFO  Analysis report uploaded in 523ms
+18:16:36.107 INFO  ANALYSIS SUCCESSFUL, you can find the results at: http://host.docker.internal:9001/dashboard?id=atlas-antes
+18:16:36.108 INFO  Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
+18:16:36.109 INFO  More about the report processing at http://host.docker.internal:9001/api/ce/task?id=2cf69c5a-6df2-4d11-b6ab-f4208e0c6419
+18:16:36.333 INFO  Analysis total time: 3:17.156 min
+18:16:36.392 INFO  SonarScanner Engine completed successfully
+18:16:36.469 INFO  EXECUTION SUCCESS
+18:16:36.513 INFO  Total time: 3:29.466s

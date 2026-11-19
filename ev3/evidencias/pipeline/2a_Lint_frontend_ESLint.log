@@ -1,0 +1,17 @@
+
+> atlas-frontend@0.0.0 lint
+> eslint .
+
+
+C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\FRONTEND\src\pages\contratos\ContratosTabList.jsx
+  243:5  warning  React Hook useMemo has a missing dependency: 'apiUrl'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\FRONTEND\src\pages\empresas\EmpresasList.jsx
+  43:35  warning  Unused eslint-disable directive (no problems were reported)
+
+C:\Users\LENOVO\Downloads\CodigoFuenteA\CodigoFuenteA\FRONTEND\src\pages\usuarios\UsuariosTabList.jsx
+  28:9  warning  The 'handleDeleteClick' function makes the dependencies of useMemo Hook (at line 154) change on every render. Move it inside the useMemo callback. Alternatively, wrap the definition of 'handleDeleteClick' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+✖ 3 problems (0 errors, 3 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

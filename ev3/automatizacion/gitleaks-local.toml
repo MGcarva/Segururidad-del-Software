@@ -1,0 +1,13 @@
+# Configuracion SOLO para la ejecucion local (modo directorio). Extiende la
+# configuracion del repositorio y omite los archivos .env de la maquina del
+# desarrollador: estan en .gitignore y nunca se versionan. En CI Gitleaks corre
+# en modo "git" sobre el historial, donde un .env commiteado SI se detecta.
+[extend]
+path = "/repo/.gitleaks.toml"
+
+[allowlist]
+description = "Archivos locales no versionados"
+paths = [
+  '''(^|/)\.env$''',
+  '''node_modules/''',
+]

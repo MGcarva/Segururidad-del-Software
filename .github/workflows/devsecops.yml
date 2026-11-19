@@ -1,0 +1,227 @@
+# Pipeline DevSecOps del Sistema Atlas (EV3 - ISY1102).
+# Integra controles de seguridad automatizados en cada etapa (Shift-Left) y
+# aplica la filosofia Fail Fast: las etapas rapidas y baratas corren primero
+# y cualquier control bloqueante detiene el pipeline antes del despliegue.
+#
+#  Etapa 1 Fuente  : Gitleaks (secretos)                       Ley 21.663 / ISO 27001 A.8.24
+#  Etapa 2 Build   : ESLint + Jest unitarias + cobertura >=80%  ISO 25010 mantenibilidad
+#  Etapa 3 SAST/SCA: Semgrep + SonarQube + npm audit            OWASP Top 10 / ISO 27001 A.8.28
+#  Etapa 4 Integr. : Docker + pruebas API seguridad + E2E       Ley 21.719 (aislamiento de datos)
+#  Etapa 5 DAST    : OWASP ZAP baseline + API scan + gate        OWASP ASVS / Ley 21.663
+#  Etapa 6 No func.: k6 carga y estres (main y nocturno)         NFR-PERF-1 / ISO 25010 eficiencia
+#  Etapa 7 Deploy  : staging con aprobacion manual (environment) Trazabilidad y segregacion de funciones
+
+name: DevSecOps Atlas
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * *"      # escaneo nocturno: detecta CVE nuevas sin cambios de codigo
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devsecops-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  # ---------------------------------------------------------------- Etapa 1
+  secretos:
+    name: "1 · Secretos (Gitleaks)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }          # historial completo: detecta secretos en commits antiguos
+      - name: Gitleaks (historial git completo)
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 \
+            git /repo --config /repo/.gitleaks.toml --redact \
+            --report-format sarif --report-path /repo/gitleaks.sarif
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: gitleaks, path: gitleaks.sarif }
+
+  # ---------------------------------------------------------------- Etapa 2
+  unitarias:
+    name: "2 · Build + pruebas unitarias"
+    needs: secretos
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            BACKEND/package-lock.json
+            FRONTEND/package-lock.json
+      - name: Instalar dependencias (lockfile, reproducible)
+        run: |
+          npm ci --prefix BACKEND
+          npm ci --prefix FRONTEND
+      - name: ESLint frontend
+        run: npm run lint --prefix FRONTEND
+      - name: Jest con cobertura (umbral 80% en modulos de seguridad)
+        working-directory: BACKEND
+        run: npx jest --ci --coverage --coverageThreshold='{"global":{"lines":80}}' --reporters=default --reporters=jest-junit
+      - name: Build frontend
+        run: npm run build --prefix FRONTEND
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unitarias
+          path: |
+            BACKEND/coverage/
+            BACKEND/junit.xml
+
+  # ---------------------------------------------------------------- Etapa 3
+  sast-sca:
+    name: "3 · SAST + SCA"
+    needs: secretos
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Semgrep (OWASP Top 10, Express, Node)
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src semgrep/semgrep:1.110.0 semgrep scan \
+            --config p/javascript --config p/nodejsscan --config p/expressjs --config p/secrets \
+            --severity ERROR --error --metrics=off --sarif -o semgrep.sarif BACKEND/src FRONTEND/src
+      - name: npm audit (dependencias de produccion, bloquea High/Critical)
+        run: |
+          npm audit --prefix BACKEND --omit=dev --audit-level=high
+          npm audit --prefix FRONTEND --omit=dev --audit-level=high
+      - name: SonarQube (Quality Gate; se omite si no hay servidor configurado)
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          args: -Dsonar.qualitygate.wait=true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: sast, path: semgrep.sarif }
+
+  # ---------------------------------------------------------------- Etapa 4
+  integracion:
+    name: "4 · Integración: API seguridad + E2E"
+    needs: [unitarias, sast-sca]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ env.NODE_VERSION }}" }
+      - name: Generar .env efimero (secreto aleatorio por ejecucion)
+        run: |
+          echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+          printf "PORT_POSTGRES=15432\nPORT_BACKEND=4450\nPORT_FRONTEND=3350\nCOMPOSE_PROJECT_NAME=atlas\n" >> .env
+      - name: Levantar Atlas con Docker Compose
+        run: |
+          docker compose up -d --build --wait
+          curl --retry 10 --retry-delay 3 --retry-all-errors -sf http://localhost:4450/
+      - name: Pruebas funcionales y de seguridad de la API (27 casos)
+        run: >
+          node --test --test-reporter=spec --test-reporter-destination=stdout
+          --test-reporter=junit --test-reporter-destination=api-junit.xml
+          ev3/automatizacion/api/atlas-api.test.mjs
+      - name: Pruebas E2E Selenium (Chrome headless)
+        working-directory: ev3/automatizacion/e2e
+        run: npm ci && npm test
+        env: { SHOTS_DIR: "${{ github.workspace }}/e2e-capturas" }
+      - name: Logs del backend (diagnostico)
+        if: failure()
+        run: docker compose logs atlas-backend --tail 200
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integracion
+          path: |
+            api-junit.xml
+            e2e-capturas/
+
+  # ---------------------------------------------------------------- Etapa 5
+  dast:
+    name: "5 · DAST OWASP ZAP + gate"
+    needs: integracion
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Levantar Atlas
+        run: |
+          echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+          docker compose up -d --build --wait
+          curl --retry 10 --retry-delay 3 --retry-all-errors -sf http://localhost:4450/
+      - name: Token de una cuenta de prueba para el escaneo autenticado
+        run: |
+          TOKEN=$(curl -s -X POST localhost:4450/autenticacion/login -H 'Content-Type: application/json' \
+            -d '{"nombre_usuario":"${{ secrets.ZAP_USER || 'admin' }}","password":"${{ secrets.ZAP_PASS || 'admin' }}"}' | jq -r .token)
+          echo "::add-mask::$TOKEN"
+          echo "ZAP_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+      - name: ZAP baseline (frontend, pasivo)
+        run: |
+          mkdir -p zap && chmod 777 zap
+          docker run --rm --network atlas-network -v "$PWD/zap:/zap/wrk:rw" zaproxy/zap-stable \
+            zap-baseline.py -t http://atlas-frontend:80 -J zap-baseline-frontend.json -r zap-baseline-frontend.html -I
+      - name: ZAP API scan (backend, activo, autenticado con OpenAPI)
+        run: |
+          docker run --rm --network atlas-network -v "$PWD/zap:/zap/wrk:rw" zaproxy/zap-stable \
+            zap-api-scan.py -t http://atlas-backend:4000/openapi.json -f openapi -O http://atlas-backend:4000 \
+            -J zap-api-backend.json -r zap-api-backend.html -I \
+            -z "-config replacer.full_list(0).description=auth -config replacer.full_list(0).enabled=true \
+                -config replacer.full_list(0).matchtype=REQ_HEADER -config replacer.full_list(0).matchstr=Authorization \
+                -config replacer.full_list(0).regex=false -config replacer.full_list(0).replacement=Bearer\ $ZAP_TOKEN"
+      - name: Quality gate (bloquea Alto y Medio no aceptado)
+        run: node ev3/automatizacion/zap/zap-gate.mjs zap/zap-baseline-frontend.json zap/zap-api-backend.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: zap, path: zap/ }
+
+  # ---------------------------------------------------------------- Etapa 6
+  rendimiento:
+    name: "6 · Carga y estrés (k6)"
+    needs: integracion
+    if: github.ref == 'refs/heads/main' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Levantar Atlas
+        run: |
+          echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+          docker compose up -d --build --wait
+      - name: k6 (umbral NFR-PERF-1 p95 < 300 ms con 50 VU)
+        run: |
+          docker run --rm --network atlas-network -v "$PWD/ev3/automatizacion/carga:/scripts" -v "$PWD:/out" \
+            grafana/k6 run --summary-export=/out/k6-summary.json /scripts/atlas-carga.k6.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: k6, path: k6-summary.json }
+
+  # ---------------------------------------------------------------- Etapa 7
+  despliegue-staging:
+    name: "7 · Despliegue a staging (aprobación manual)"
+    needs: [dast, rendimiento]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging            # requiere aprobacion de un revisor distinto al autor (segregacion de funciones)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publicar imagenes etiquetadas con el SHA del commit (trazabilidad)
+        run: |
+          docker compose build
+          echo "Imagenes atlas-backend:${GITHUB_SHA::7} y atlas-frontend:${GITHUB_SHA::7} listas para staging"

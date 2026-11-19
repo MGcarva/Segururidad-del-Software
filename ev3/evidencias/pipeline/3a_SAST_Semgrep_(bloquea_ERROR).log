@@ -1,0 +1,30 @@
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 50 files tracked by git with 132 Code rules:
+                                                                                                                        
+  Language      Rules   Files          Origin      Rules                                                                
+ ─────────────────────────────        ───────────────────                                                               
+  <multilang>      36      50          Community     132                                                                
+  js               92      44                                                                                           
+                                                                                                                        
+Warning: 1 timeout error(s) in BACKEND/src/routes/contracts.js when running the following rules:
+[ajinabraham.njsscan.dos.regex_injection.regex_injection_dos]
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 128
+ • Targets scanned: 50
+ • Parsed lines: ~100.0%
+ • No ignore information available
+Ran 128 rules on 50 files: 0 findings.
+(need more rules? `semgrep login` for additional free Semgrep Registry rules)
+
+If Semgrep missed a finding, please send us feedback to let us know!
+See https://semgrep.dev/docs/reporting-false-negatives/

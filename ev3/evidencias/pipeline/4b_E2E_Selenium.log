@@ -1,0 +1,13 @@
+✔ E2E-01 [RF-1.1] Login valido redirige al panel de inicio (15502.9651ms)
+✔ E2E-02 [NFR-SEG] Login invalido muestra mensaje generico y no da acceso (6024.0037ms)
+✔ E2E-03 [RF-1.3] Una ruta protegida sin sesion redirige al login (2314.941ms)
+✔ E2E-04 [RF-3.2] Usuario autenticado navega al listado de clientes (4878.2789ms)
+✔ E2E-05 [RF-1.2] Cerrar sesion devuelve al login y bloquea el regreso (7889.8125ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 41066.1238

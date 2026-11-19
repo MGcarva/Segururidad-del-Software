@@ -1,0 +1,59 @@
+{
+  "id": "6f1c2a10-ev3a-4c1e-9a11-atlas00000001",
+  "version": "2.0",
+  "name": "Atlas - Autenticacion",
+  "url": "http://localhost:3350",
+  "tests": [
+    {
+      "id": "t-login-valido",
+      "name": "E2E-01 Login valido",
+      "commands": [
+        { "id": "c1", "comment": "Abrir la pantalla de login", "command": "open", "target": "/login", "targets": [], "value": "" },
+        { "id": "c2", "comment": "", "command": "setWindowSize", "target": "1366x850", "targets": [], "value": "" },
+        { "id": "c3", "comment": "Ingresar usuario", "command": "type", "target": "css=[data-testid=input-nombre-usuario]", "targets": [], "value": "admin" },
+        { "id": "c4", "comment": "Ingresar contrasena", "command": "type", "target": "css=[data-testid=input-password]", "targets": [], "value": "admin" },
+        { "id": "c5", "comment": "Enviar formulario", "command": "click", "target": "css=[data-testid=button-login]", "targets": [], "value": "" },
+        { "id": "c6", "comment": "Espera dinamica al menu lateral", "command": "waitForElementVisible", "target": "css=[data-testid=button-layout-logout]", "targets": [], "value": "10000" },
+        { "id": "c7", "comment": "Asercion: se muestra el panel de inicio", "command": "assertElementPresent", "target": "css=[data-testid=link-nav-inicio]", "targets": [], "value": "" }
+      ]
+    },
+    {
+      "id": "t-login-invalido",
+      "name": "E2E-02 Login invalido",
+      "commands": [
+        { "id": "d1", "comment": "", "command": "open", "target": "/login", "targets": [], "value": "" },
+        { "id": "d2", "comment": "", "command": "type", "target": "css=[data-testid=input-nombre-usuario]", "targets": [], "value": "admin" },
+        { "id": "d3", "comment": "", "command": "type", "target": "css=[data-testid=input-password]", "targets": [], "value": "clave-incorrecta" },
+        { "id": "d4", "comment": "", "command": "click", "target": "css=[data-testid=button-login]", "targets": [], "value": "" },
+        { "id": "d5", "comment": "Mensaje generico, no revela si el usuario existe", "command": "waitForElementVisible", "target": "css=[data-sonner-toast]", "targets": [], "value": "10000" },
+        { "id": "d6", "comment": "", "command": "assertText", "target": "css=[data-sonner-toast]", "targets": [], "value": "Credenciales inválidas" },
+        { "id": "d7", "comment": "Sigue en la pantalla de login", "command": "assertElementPresent", "target": "css=[data-testid=button-login]", "targets": [], "value": "" }
+      ]
+    },
+    {
+      "id": "t-logout",
+      "name": "E2E-05 Cierre de sesion",
+      "commands": [
+        { "id": "e1", "comment": "", "command": "open", "target": "/login", "targets": [], "value": "" },
+        { "id": "e2", "comment": "", "command": "type", "target": "css=[data-testid=input-nombre-usuario]", "targets": [], "value": "admin" },
+        { "id": "e3", "comment": "", "command": "type", "target": "css=[data-testid=input-password]", "targets": [], "value": "admin" },
+        { "id": "e4", "comment": "", "command": "click", "target": "css=[data-testid=button-login]", "targets": [], "value": "" },
+        { "id": "e5", "comment": "", "command": "waitForElementVisible", "target": "css=[data-testid=button-layout-logout]", "targets": [], "value": "10000" },
+        { "id": "e6", "comment": "", "command": "click", "target": "css=[data-testid=button-layout-logout]", "targets": [], "value": "" },
+        { "id": "e7", "comment": "", "command": "waitForElementVisible", "target": "css=[data-testid=button-login]", "targets": [], "value": "10000" }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "s-auth",
+      "name": "Suite Autenticacion Atlas",
+      "persistSession": false,
+      "parallel": false,
+      "timeout": 300,
+      "tests": ["t-login-valido", "t-login-invalido", "t-logout"]
+    }
+  ],
+  "urls": ["http://localhost:3350/"],
+  "plugins": []
+}

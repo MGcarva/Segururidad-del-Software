@@ -1,0 +1,15 @@
+Pipeline DevSecOps Atlas (ejecucion local) - 2026-11-17 15:31
+▶ 1 Secretos Gitleaks                          OK        65.3 s
+▶ 2a Lint frontend ESLint                      OK        48.4 s
+▶ 2b Unitarias Jest + cobertura 80             OK        50.9 s
+▶ 3a SAST Semgrep (bloquea ERROR)              OK       174.9 s
+▶ 3b SCA npm audit prod (bloquea High)         OK        42.7 s
+▶ 4a API funcional + seguridad                 OK        13.8 s
+▶ 4b E2E Selenium                              OK        42.2 s
+▶ 5a DAST ZAP baseline frontend                OK       424.8 s
+▶ 5b DAST ZAP API scan backend                 OK       298.3 s
+▶ 5c Gate ZAP (Alto/Medio no aceptado)         OK         0.3 s
+▶ 6 Carga y estres k6                          OK        87.8 s
+✔ Pipeline completo. Tiempos en ev3/evidencias/pipeline/pipeline-tiempos.json
+
+[exited with code 0]

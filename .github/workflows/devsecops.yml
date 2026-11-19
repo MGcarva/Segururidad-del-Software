@@ -223,5 +223,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Publicar imagenes etiquetadas con el SHA del commit (trazabilidad)
         run: |
+          # compose exige JWT_SECRET (fail-safe); en staging real vendria de un secreto del environment
+          echo "JWT_SECRET=${{ secrets.STAGING_JWT_SECRET || 'build-only-placeholder-no-se-usa-en-runtime-0000' }}" > .env
           docker compose build
           echo "Imagenes atlas-backend:${GITHUB_SHA::7} y atlas-frontend:${GITHUB_SHA::7} listas para staging"

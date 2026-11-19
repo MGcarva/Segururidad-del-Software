@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }          # historial completo: detecta secretos en commits antiguos
       - name: Gitleaks (historial git completo)
         run: |
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -94,7 +94,7 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
       - name: Semgrep (OWASP Top 10, Express, Node)
         run: |
@@ -121,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with: { node-version: "${{ env.NODE_VERSION }}" }
       - name: Generar .env efimero (secreto aleatorio por ejecucion)
@@ -159,7 +159,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Levantar Atlas
         run: |
           echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
@@ -198,7 +198,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Levantar Atlas
         run: |
           echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
@@ -220,7 +220,7 @@ jobs:
     environment:
       name: staging            # requiere aprobacion de un revisor distinto al autor (segregacion de funciones)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Publicar imagenes etiquetadas con el SHA del commit (trazabilidad)
         run: |
           # compose exige JWT_SECRET (fail-safe); en staging real vendria de un secreto del environment

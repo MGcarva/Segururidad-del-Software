@@ -1,5 +1,5 @@
 # Node 22 LTS (Node 18 sin soporte desde abril 2025 - mantenimiento preventivo EV3)
-FROM node:22-alpine
+FROM node:26-alpine
 
 WORKDIR /app
 

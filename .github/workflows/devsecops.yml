@@ -84,7 +84,7 @@ jobs:
             evidencias-gitleaks/gitleaks-report.json \
             evidencias-gitleaks/gitleaks-summary.md
           cat evidencias-gitleaks/gitleaks-summary.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-gitleaks
@@ -125,7 +125,7 @@ jobs:
             evidencias-npm-audit/audit-frontend.json \
             evidencias-npm-audit/npm-audit-summary.md
           cat evidencias-npm-audit/npm-audit-summary.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-npm-audit
@@ -187,7 +187,7 @@ jobs:
             evidencias-jest/eslint-report.json \
             evidencias-jest/jest-summary.md
           cat evidencias-jest/jest-summary.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-jest
@@ -248,7 +248,7 @@ jobs:
             evidencias-supertest/api-security-junit.xml \
             evidencias-supertest/supertest-summary.md
           cat evidencias-supertest/supertest-summary.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-supertest
@@ -315,7 +315,7 @@ jobs:
             evidencias-selenium/e2e-capturas \
             evidencias-selenium/selenium-summary.md
           cat evidencias-selenium/selenium-summary.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-selenium
@@ -444,7 +444,7 @@ jobs:
             "${SONAR_MODO:-No determinado}" \
             evidencias-sonarqube/sonarqube-summary.md
           cat evidencias-sonarqube/sonarqube-summary.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-sonarqube
@@ -520,7 +520,7 @@ jobs:
             evidencias-zap/zap-gate.txt \
             evidencias-zap/zap-summary.md
           cat evidencias-zap/zap-summary.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-owasp-zap
@@ -596,7 +596,7 @@ jobs:
           if [ -f evidencias-jmeter/jmeter-summary.md ]; then
             cat evidencias-jmeter/jmeter-summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-jmeter
@@ -646,7 +646,7 @@ jobs:
           set -e
           cat evidencias-gate/resumen-pipeline.md >> "$GITHUB_STEP_SUMMARY"
           exit $RC
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-resumen-pipeline
@@ -682,7 +682,7 @@ jobs:
           } > evidencias-staging/staging-manifest.txt
           cat evidencias-staging/staging-manifest.txt
           cat evidencias-staging/staging-manifest.txt >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidencia-staging

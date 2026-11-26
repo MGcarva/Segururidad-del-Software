@@ -1,15 +1,30 @@
-# Pipeline DevSecOps del Sistema Atlas (EV3 - ISY1102).
-# Integra controles de seguridad automatizados en cada etapa (Shift-Left) y
-# aplica la filosofia Fail Fast: las etapas rapidas y baratas corren primero
-# y cualquier control bloqueante detiene el pipeline antes del despliegue.
+# Pipeline DevSecOps del Sistema Atlas (Repositorio Público).
+# Arquitectura en 3 etapas encadenadas con `needs` (fail-fast + shift-left):
+#   - ETAPA 1 · Controles rápidos y baratos (en paralelo entre sí): Gitleaks,
+#     npm audit, Jest/ESLint/build y SonarQube. No levantan el stack Docker.
+#   - ETAPA 2 · Controles pesados (en paralelo entre sí): Supertest, Selenium,
+#     OWASP ZAP y JMeter. `needs` de los 4 jobs de la Etapa 1: si alguno falla,
+#     la Etapa 2 NO se ejecuta (se omite), ahorrando minutos de runner.
+#   - ETAPA 3 · `gate-calidad` (if: always()) consolida los resultados y FALLA
+#     si al menos 1 job no aprobó (un job omitido cuenta como no aprobado),
+#     bloqueando `despliegue-staging` y cualquier pipeline posterior encadenado
+#     (`workflow_call` / `workflow_run`).
+#   - Dentro de cada job, los pasos de evidencia corren con `if: always()` y se
+#     suben como GitHub Artifact con retención de 3 días.
 #
-#  Etapa 1 Fuente  : Gitleaks (secretos)                       Ley 21.663 / ISO 27001 A.8.24
-#  Etapa 2 Build   : ESLint + Jest unitarias + cobertura >=80%  ISO 25010 mantenibilidad
-#  Etapa 3 SAST/SCA: Semgrep + SonarQube + npm audit            OWASP Top 10 / ISO 27001 A.8.28
-#  Etapa 4 Integr. : Docker + pruebas API seguridad + E2E       Ley 21.719 (aislamiento de datos)
-#  Etapa 5 DAST    : OWASP ZAP baseline + API scan + gate        OWASP ASVS / Ley 21.663
-#  Etapa 6 No func.: k6 carga y estres (main y nocturno)         NFR-PERF-1 / ISO 25010 eficiencia
-#  Etapa 7 Deploy  : staging con aprobacion manual (environment) Trazabilidad y segregacion de funciones
+# Etapa 1
+#  1 · Gitleaks       : Escaneo de secretos en historial git completo (--redact)
+#  2 · npm audit      : Análisis SCA de dependencias de producción (High/Critical)
+#  3 · Jest           : Pruebas unitarias + cobertura >=80% + ESLint + build front
+#  6 · SonarQube      : SAST + Quality Gate (híbrido: SonarCloud/externo o Docker efímero)
+# Etapa 2
+#  4 · Supertest      : Pruebas de integración API/BD (Jest+Supertest) + seguridad API
+#  5 · Selenium       : Selenium IDE (.side) + Selenium WebDriver POM (Chrome headless)
+#  7 · OWASP ZAP      : DAST baseline frontend + API scan OpenAPI autenticado + gate
+#  8 · Apache JMeter  : Carga CRUD 50u (<300 ms), CRUD 200u (<300 ms, 5xx <1%), Docs (<=10 s)
+# Etapa 3
+#  9 · Gate Final     : Veredicto consolidado (falla si >=1 job falló u fue omitido)
+# 10 · Staging        : Despliegue con aprobación manual (solo si Gate Final aprueba)
 
 name: DevSecOps Atlas
 
@@ -19,8 +34,9 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: "0 6 * * *"      # escaneo nocturno: detecta CVE nuevas sin cambios de codigo
+    - cron: "0 6 * * *"      # escaneo nocturno: detecta CVE nuevas sin cambios de código
   workflow_dispatch:
+  workflow_call:             # permite encadenar este pipeline como requisito bloqueante
 
 permissions:
   contents: read
@@ -31,31 +47,99 @@ concurrency:
 
 env:
   NODE_VERSION: "20"
+  JMETER_VERSION: "5.6.3"
 
 jobs:
-  # ---------------------------------------------------------------- Etapa 1
-  secretos:
+  # ==========================================================================
+  # 1 · GITLEAKS (Detección de secretos)
+  # ==========================================================================
+  gitleaks:
     name: "1 · Secretos (Gitleaks)"
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }          # historial completo: detecta secretos en commits antiguos
-      - name: Gitleaks (historial git completo)
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Ejecutar Gitleaks (historial git completo, valores redactados)
         run: |
+          mkdir -p evidencias-gitleaks
+          set +e
           docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 \
             git /repo --config /repo/.gitleaks.toml --redact \
-            --report-format sarif --report-path /repo/gitleaks.sarif
+            --report-format json --report-path /repo/evidencias-gitleaks/gitleaks-report.json
+          RC=$?
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 \
+            git /repo --config /repo/.gitleaks.toml --redact --exit-code 0 \
+            --report-format sarif --report-path /repo/evidencias-gitleaks/gitleaks.sarif
+          set -e
+          exit $RC
+      - name: Generar resumen de evidencia
+        if: always()
+        run: |
+          node ev3/automatizacion/ci/generar-resumen.mjs gitleaks \
+            evidencias-gitleaks/gitleaks-report.json \
+            evidencias-gitleaks/gitleaks-summary.md
+          cat evidencias-gitleaks/gitleaks-summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: gitleaks, path: gitleaks.sarif }
+        with:
+          name: evidencia-gitleaks
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-gitleaks/
 
-  # ---------------------------------------------------------------- Etapa 2
-  unitarias:
-    name: "2 · Build + pruebas unitarias"
-    needs: secretos
+  # ==========================================================================
+  # 2 · NPM AUDIT (SCA de dependencias)
+  # ==========================================================================
+  npm-audit:
+    name: "2 · Dependencias (npm audit)"
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Ejecutar npm audit en BACKEND y FRONTEND (producción, bloquea High/Critical)
+        run: |
+          mkdir -p evidencias-npm-audit
+          set +e
+          npm audit --prefix BACKEND --omit=dev --audit-level=high --json > evidencias-npm-audit/audit-backend.json
+          RC_BACK=$?
+          npm audit --prefix FRONTEND --omit=dev --audit-level=high --json > evidencias-npm-audit/audit-frontend.json
+          RC_FRONT=$?
+          set -e
+          echo "Códigos de salida -> BACKEND: $RC_BACK | FRONTEND: $RC_FRONT"
+          if [ "$RC_BACK" -ne 0 ] || [ "$RC_FRONT" -ne 0 ]; then
+            exit 1
+          fi
+      - name: Generar resumen de evidencia
+        if: always()
+        run: |
+          node ev3/automatizacion/ci/generar-resumen.mjs npm-audit \
+            evidencias-npm-audit/audit-backend.json \
+            evidencias-npm-audit/audit-frontend.json \
+            evidencias-npm-audit/npm-audit-summary.md
+          cat evidencias-npm-audit/npm-audit-summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencia-npm-audit
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-npm-audit/
+
+  # ==========================================================================
+  # 3 · JEST (Pruebas unitarias, cobertura >= 80%, ESLint y build frontend)
+  # ==========================================================================
+  jest-unitarias:
+    name: "3 · Unitarias y Cobertura (Jest)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -65,165 +149,543 @@ jobs:
           cache-dependency-path: |
             BACKEND/package-lock.json
             FRONTEND/package-lock.json
-      - name: Instalar dependencias (lockfile, reproducible)
+      - name: Instalar dependencias reproducibles (npm ci)
         run: |
           npm ci --prefix BACKEND
           npm ci --prefix FRONTEND
-      - name: ESLint frontend
-        run: npm run lint --prefix FRONTEND
-      - name: Jest con cobertura (umbral 80% en modulos de seguridad)
-        working-directory: BACKEND
-        run: npx jest --ci --coverage --coverageThreshold='{"global":{"lines":80}}' --reporters=default --reporters=jest-junit
-      - name: Build frontend
-        run: npm run build --prefix FRONTEND
+      - name: Ejecutar Jest, ESLint y build frontend (todos corren antes de fallar)
+        run: |
+          mkdir -p evidencias-jest
+          set +e
+          (cd BACKEND && npx jest --ci --coverage \
+            --coverageThreshold='{"global":{"lines":80}}' \
+            --reporters=default --reporters=jest-junit \
+            --json --outputFile=jest-results.json)
+          RC_JEST=$?
+
+          (cd FRONTEND && npx eslint . --format json --output-file ../evidencias-jest/eslint-report.json)
+          RC_LINT=$?
+
+          npm run build --prefix FRONTEND
+          RC_BUILD=$?
+          set -e
+
+          cp -f BACKEND/junit.xml evidencias-jest/junit.xml 2>/dev/null || true
+          cp -f BACKEND/jest-results.json evidencias-jest/jest-results.json 2>/dev/null || true
+          cp -rf BACKEND/coverage evidencias-jest/coverage 2>/dev/null || true
+
+          echo "Códigos de salida -> Jest: $RC_JEST | ESLint: $RC_LINT | Build: $RC_BUILD"
+          if [ "$RC_JEST" -ne 0 ] || [ "$RC_LINT" -ne 0 ] || [ "$RC_BUILD" -ne 0 ]; then
+            exit 1
+          fi
+      - name: Generar resumen de evidencia
+        if: always()
+        run: |
+          node ev3/automatizacion/ci/generar-resumen.mjs jest \
+            evidencias-jest/jest-results.json \
+            evidencias-jest/coverage/coverage-summary.json \
+            evidencias-jest/eslint-report.json \
+            evidencias-jest/jest-summary.md
+          cat evidencias-jest/jest-summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: unitarias
-          path: |
-            BACKEND/coverage/
-            BACKEND/junit.xml
+          name: evidencia-jest
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-jest/
 
-  # ---------------------------------------------------------------- Etapa 3
-  sast-sca:
-    name: "3 · SAST + SCA"
-    needs: secretos
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - name: Semgrep (OWASP Top 10, Express, Node)
-        run: |
-          docker run --rm -v "$PWD:/src" -w /src semgrep/semgrep:1.110.0 semgrep scan \
-            --config p/javascript --config p/nodejsscan --config p/expressjs --config p/secrets \
-            --severity ERROR --error --metrics=off --sarif -o semgrep.sarif BACKEND/src FRONTEND/src
-      - name: npm audit (dependencias de produccion, bloquea High/Critical)
-        run: |
-          npm audit --prefix BACKEND --omit=dev --audit-level=high
-          npm audit --prefix FRONTEND --omit=dev --audit-level=high
-      - name: SonarQube (Quality Gate; se omite si no hay servidor configurado)
-        if: env.SONAR_TOKEN != ''
-        uses: SonarSource/sonarqube-scan-action@v5
-        with:
-          args: -Dsonar.qualitygate.wait=true
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: { name: sast, path: semgrep.sarif }
-
-  # ---------------------------------------------------------------- Etapa 4
-  integracion:
-    name: "4 · Integración: API seguridad + E2E"
-    needs: [unitarias, sast-sca]
+  # ==========================================================================
+  # 4 · SUPERTEST (Pruebas de integración API + BD real + suite seguridad API)
+  # ==========================================================================
+  supertest-integracion:
+    name: "4 · Integración API (Supertest)"
+    needs: [gitleaks, npm-audit, jest-unitarias, sonarqube]   # Etapa 2: solo si la Etapa 1 aprobó (fail-fast)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: "${{ env.NODE_VERSION }}" }
-      - name: Generar .env efimero (secreto aleatorio por ejecucion)
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: BACKEND/package-lock.json
+      - name: Generar .env efímero y levantar stack Atlas (Docker Compose)
         run: |
           echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
           printf "PORT_POSTGRES=15432\nPORT_BACKEND=4450\nPORT_FRONTEND=3350\nCOMPOSE_PROJECT_NAME=atlas\n" >> .env
-      - name: Levantar Atlas con Docker Compose
-        run: |
           docker compose up -d --build --wait
-          curl --retry 10 --retry-delay 3 --retry-all-errors -sf http://localhost:4450/
-      - name: Pruebas funcionales y de seguridad de la API (27 casos)
-        run: >
-          node --test --test-reporter=spec --test-reporter-destination=stdout
-          --test-reporter=junit --test-reporter-destination=api-junit.xml
-          ev3/automatizacion/api/atlas-api.test.mjs
-      - name: Pruebas E2E Selenium (Chrome headless)
-        working-directory: ev3/automatizacion/e2e
-        run: npm ci && npm test
-        env: { SHOTS_DIR: "${{ github.workspace }}/e2e-capturas" }
-      - name: Logs del backend (diagnostico)
-        if: failure()
-        run: docker compose logs atlas-backend --tail 200
+          curl --retry 15 --retry-delay 3 --retry-all-errors -sf http://localhost:4450/
+      - name: Instalar dependencias del backend
+        run: npm ci --prefix BACKEND
+      - name: Ejecutar Supertest + suite de seguridad API (ambas corren)
+        run: |
+          mkdir -p evidencias-supertest
+          set +e
+          (cd BACKEND && JEST_JUNIT_OUTPUT_NAME=supertest-junit.xml npm run test:integration:ci)
+          RC_ST=$?
+
+          node --test \
+            --test-reporter=spec --test-reporter-destination=stdout \
+            --test-reporter=junit --test-reporter-destination=evidencias-supertest/api-security-junit.xml \
+            ev3/automatizacion/api/atlas-api.test.mjs
+          RC_API=$?
+          set -e
+
+          cp -f BACKEND/supertest-junit.xml evidencias-supertest/supertest-junit.xml 2>/dev/null || true
+          cp -f BACKEND/supertest-results.json evidencias-supertest/supertest-results.json 2>/dev/null || true
+
+          echo "Códigos de salida -> Supertest: $RC_ST | API Seguridad: $RC_API"
+          if [ "$RC_ST" -ne 0 ] || [ "$RC_API" -ne 0 ]; then
+            docker compose logs atlas-backend --tail 200 > evidencias-supertest/backend-logs.txt 2>&1 || true
+            exit 1
+          fi
+      - name: Generar resumen de evidencia
+        if: always()
+        run: |
+          node ev3/automatizacion/ci/generar-resumen.mjs supertest \
+            evidencias-supertest/supertest-results.json \
+            evidencias-supertest/api-security-junit.xml \
+            evidencias-supertest/supertest-summary.md
+          cat evidencias-supertest/supertest-summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: integracion
-          path: |
-            api-junit.xml
-            e2e-capturas/
+          name: evidencia-supertest
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-supertest/
 
-  # ---------------------------------------------------------------- Etapa 5
-  dast:
-    name: "5 · DAST OWASP ZAP + gate"
-    needs: integracion
+  # ==========================================================================
+  # 5 · SELENIUM (Selenium IDE .side + Selenium WebDriver POM en Chrome headless)
+  # ==========================================================================
+  selenium-e2e:
+    name: "5 · E2E Navegador (Selenium IDE + WebDriver)"
+    needs: [gitleaks, npm-audit, jest-unitarias, sonarqube]   # Etapa 2: solo si la Etapa 1 aprobó (fail-fast)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ev3/automatizacion/e2e/package-lock.json
+      - name: Generar .env efímero y levantar stack Atlas
+        run: |
+          echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+          printf "PORT_POSTGRES=15432\nPORT_BACKEND=4450\nPORT_FRONTEND=3350\nCOMPOSE_PROJECT_NAME=atlas\n" >> .env
+          docker compose up -d --build --wait
+          curl --retry 15 --retry-delay 3 --retry-all-errors -sf http://localhost:4450/
+          curl --retry 10 --retry-delay 2 --retry-all-errors -sf http://localhost:3350/ > /dev/null
+      - name: Instalar dependencias de Selenium WebDriver
+        run: npm ci --prefix ev3/automatizacion/e2e
+      - name: Ejecutar Selenium IDE (atlas-login.side) y Selenium WebDriver POM (ambos corren)
+        run: |
+          mkdir -p evidencias-selenium/selenium-ide-results evidencias-selenium/e2e-capturas
+          set +e
+
+          echo "=== 1. Selenium IDE (selenium-side-runner) ==="
+          npx --yes selenium-side-runner@4.0.0-beta.14 \
+            --base-url http://localhost:3350 \
+            --output-directory "$PWD/evidencias-selenium/selenium-ide-results" \
+            --output-format jest \
+            -c "browserName=chrome goog:chromeOptions.args=[headless=new,no-sandbox,disable-dev-shm-usage,window-size=1366,850]" \
+            ev3/automatizacion/selenium-ide/atlas-login.side > evidencias-selenium/selenium-ide.log 2>&1
+          RC_IDE=$?
+          cat evidencias-selenium/selenium-ide.log
+
+          echo "=== 2. Selenium WebDriver POM (atlas-e2e.test.mjs) ==="
+          (cd ev3/automatizacion/e2e && SHOTS_DIR="$GITHUB_WORKSPACE/evidencias-selenium/e2e-capturas" npm run test:ci)
+          RC_WD=$?
+          set -e
+
+          cp -f ev3/automatizacion/e2e/e2e-junit.xml evidencias-selenium/e2e-junit.xml 2>/dev/null || true
+          echo "Códigos de salida -> Selenium IDE: $RC_IDE | Selenium WebDriver: $RC_WD"
+          if [ "$RC_IDE" -ne 0 ] || [ "$RC_WD" -ne 0 ]; then
+            docker compose logs atlas-backend --tail 150 > evidencias-selenium/backend-logs.txt 2>&1 || true
+            exit 1
+          fi
+      - name: Generar resumen de evidencia
+        if: always()
+        run: |
+          node ev3/automatizacion/ci/generar-resumen.mjs selenium \
+            evidencias-selenium/selenium-ide-results \
+            evidencias-selenium/e2e-junit.xml \
+            evidencias-selenium/e2e-capturas \
+            evidencias-selenium/selenium-summary.md
+          cat evidencias-selenium/selenium-summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencia-selenium
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-selenium/
+
+  # ==========================================================================
+  # 6 · SONARQUBE (SAST + Quality Gate — Híbrido: Externo/SonarCloud o Docker)
+  # ==========================================================================
+  sonarqube:
+    name: "6 · Análisis Estático (SonarQube)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Ejecutar análisis SonarQube (externo/SonarCloud o efímero en Docker)
+        run: |
+          mkdir -p evidencias-sonarqube
+          PROJECT_KEY="atlas-sistema-gestion"
+          RC_SCAN=0
+
+          if [ -n "${SONAR_TOKEN:-}" ]; then
+            # --- Modo 1: SonarCloud o servidor SonarQube externo ---
+            HOST_URL="${SONAR_HOST_URL:-https://sonarcloud.io}"
+            echo "SONAR_MODO=Externo ($HOST_URL)" >> "$GITHUB_ENV"
+            ORG_ARG=""
+            if [ -n "${SONAR_ORGANIZATION:-}" ]; then
+              ORG_ARG="-Dsonar.organization=$SONAR_ORGANIZATION"
+            fi
+
+            set +e
+            docker run --rm \
+              -e SONAR_HOST_URL="$HOST_URL" \
+              -e SONAR_TOKEN="$SONAR_TOKEN" \
+              -v "$PWD:/usr/src" \
+              sonarsource/sonar-scanner-cli:11 \
+              -Dsonar.qualitygate.wait=true $ORG_ARG
+            RC_SCAN=$?
+            set -e
+
+            curl -sS -u "$SONAR_TOKEN:" "$HOST_URL/api/measures/component?component=$PROJECT_KEY&metricKeys=bugs,vulnerabilities,security_hotspots,code_smells,security_rating,reliability_rating,duplicated_lines_density,ncloc" \
+              -o evidencias-sonarqube/measures.json || true
+            curl -sS -u "$SONAR_TOKEN:" "$HOST_URL/api/issues/search?componentKeys=$PROJECT_KEY&ps=100" \
+              -o evidencias-sonarqube/issues.json || true
+            curl -sS -u "$SONAR_TOKEN:" "$HOST_URL/api/qualitygates/project_status?projectKey=$PROJECT_KEY" \
+              -o evidencias-sonarqube/quality-gate.json || true
+          else
+            # --- Modo 2: SonarQube Community efímero en Docker (cero secretos) ---
+            echo "SONAR_MODO=SonarQube Community efímero (Docker)" >> "$GITHUB_ENV"
+            docker network create sonar-net
+            docker run -d --name sonarqube-ci --network sonar-net -p 127.0.0.1:9000:9000 \
+              -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
+              sonarqube:community
+
+            echo "Esperando a que SonarQube Community inicie..."
+            READY=0
+            for i in $(seq 1 60); do
+              STATUS=$(curl -sf http://127.0.0.1:9000/api/system/status | jq -r .status 2>/dev/null || echo "STARTING")
+              echo "  Intento $i/60: $STATUS"
+              if [ "$STATUS" = "UP" ]; then
+                READY=1
+                break
+              fi
+              sleep 5
+            done
+            if [ "$READY" -ne 1 ]; then
+              docker logs sonarqube-ci --tail 100 > evidencias-sonarqube/sonarqube-boot.log 2>&1 || true
+              echo "SonarQube no alcanzó estado UP a tiempo"
+              exit 1
+            fi
+
+            NEW_PASS="Atlas#$(openssl rand -hex 8)!1"
+            echo "::add-mask::$NEW_PASS"
+            curl -sf -u "admin:admin" -X POST "http://127.0.0.1:9000/api/users/change_password" \
+              -d "login=admin&previousPassword=admin&password=$NEW_PASS"
+
+            EPHEMERAL_TOKEN=$(curl -sf -u "admin:$NEW_PASS" -X POST "http://127.0.0.1:9000/api/user_tokens/generate" \
+              -d "name=ci-atlas-token" | jq -r .token)
+            echo "::add-mask::$EPHEMERAL_TOKEN"
+
+            curl -sf -u "$EPHEMERAL_TOKEN:" -X POST "http://127.0.0.1:9000/api/projects/create" \
+              -d "project=$PROJECT_KEY&name=Sistema+de+Gestion+Atlas" > /dev/null
+
+            set +e
+            docker run --rm --network sonar-net \
+              -e SONAR_HOST_URL="http://sonarqube-ci:9000" \
+              -e SONAR_TOKEN="$EPHEMERAL_TOKEN" \
+              -v "$PWD:/usr/src" \
+              sonarsource/sonar-scanner-cli:11 \
+              -Dsonar.qualitygate.wait=true
+            RC_SCAN=$?
+            set -e
+
+            curl -sS -u "$EPHEMERAL_TOKEN:" "http://127.0.0.1:9000/api/measures/component?component=$PROJECT_KEY&metricKeys=bugs,vulnerabilities,security_hotspots,code_smells,security_rating,reliability_rating,duplicated_lines_density,ncloc" \
+              -o evidencias-sonarqube/measures.json || true
+            curl -sS -u "$EPHEMERAL_TOKEN:" "http://127.0.0.1:9000/api/issues/search?componentKeys=$PROJECT_KEY&ps=100" \
+              -o evidencias-sonarqube/issues.json || true
+            curl -sS -u "$EPHEMERAL_TOKEN:" "http://127.0.0.1:9000/api/qualitygates/project_status?projectKey=$PROJECT_KEY" \
+              -o evidencias-sonarqube/quality-gate.json || true
+
+            docker rm -f sonarqube-ci >/dev/null 2>&1 || true
+          fi
+
+          QG_STATUS=$(jq -r '.projectStatus.status // "ERROR"' evidencias-sonarqube/quality-gate.json 2>/dev/null || echo "ERROR")
+          echo "SonarQube -> Scanner RC: $RC_SCAN | Quality Gate: $QG_STATUS"
+          if [ "$RC_SCAN" -ne 0 ] || [ "$QG_STATUS" != "OK" ]; then
+            exit 1
+          fi
+      - name: Generar resumen de evidencia
+        if: always()
+        run: |
+          node ev3/automatizacion/ci/generar-resumen.mjs sonarqube \
+            evidencias-sonarqube/measures.json \
+            evidencias-sonarqube/issues.json \
+            evidencias-sonarqube/quality-gate.json \
+            "${SONAR_MODO:-No determinado}" \
+            evidencias-sonarqube/sonarqube-summary.md
+          cat evidencias-sonarqube/sonarqube-summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencia-sonarqube
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-sonarqube/
+
+  # ==========================================================================
+  # 7 · OWASP ZAP (DAST baseline frontend + API scan OpenAPI + gate)
+  # ==========================================================================
+  owasp-zap:
+    name: "7 · Seguridad Dinámica (OWASP ZAP)"
+    needs: [gitleaks, npm-audit, jest-unitarias, sonarqube]   # Etapa 2: solo si la Etapa 1 aprobó (fail-fast)
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Levantar Atlas
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Generar .env efímero y levantar stack Atlas
         run: |
           echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+          printf "PORT_POSTGRES=15432\nPORT_BACKEND=4450\nPORT_FRONTEND=3350\nCOMPOSE_PROJECT_NAME=atlas\n" >> .env
           docker compose up -d --build --wait
-          curl --retry 10 --retry-delay 3 --retry-all-errors -sf http://localhost:4450/
-      - name: Token de una cuenta de prueba para el escaneo autenticado
+          curl --retry 15 --retry-delay 3 --retry-all-errors -sf http://localhost:4450/
+          curl --retry 10 --retry-delay 2 --retry-all-errors -sf http://localhost:3350/ > /dev/null
+      - name: Obtener token efímero de prueba (enmascarado)
+        env:
+          ZAP_USER: ${{ secrets.ZAP_USER }}
+          ZAP_PASS: ${{ secrets.ZAP_PASS }}
         run: |
-          TOKEN=$(curl -s -X POST localhost:4450/autenticacion/login -H 'Content-Type: application/json' \
-            -d '{"nombre_usuario":"${{ secrets.ZAP_USER || 'admin' }}","password":"${{ secrets.ZAP_PASS || 'admin' }}"}' | jq -r .token)
+          PAYLOAD=$(jq -n --arg u "${ZAP_USER:-admin}" --arg p "${ZAP_PASS:-admin}" '{nombre_usuario:$u,password:$p}')
+          TOKEN=$(curl -sf -X POST http://localhost:4450/autenticacion/login \
+            -H 'Content-Type: application/json' \
+            -d "$PAYLOAD" | jq -r .token)
           echo "::add-mask::$TOKEN"
           echo "ZAP_TOKEN=$TOKEN" >> "$GITHUB_ENV"
-      - name: ZAP baseline (frontend, pasivo)
+      - name: Ejecutar ZAP Baseline (frontend) + ZAP API Scan (backend) + Gate
         run: |
-          mkdir -p zap && chmod 777 zap
-          docker run --rm --network atlas-network -v "$PWD/zap:/zap/wrk:rw" zaproxy/zap-stable \
-            zap-baseline.py -t http://atlas-frontend:80 -J zap-baseline-frontend.json -r zap-baseline-frontend.html -I
-      - name: ZAP API scan (backend, activo, autenticado con OpenAPI)
-        run: |
-          docker run --rm --network atlas-network -v "$PWD/zap:/zap/wrk:rw" zaproxy/zap-stable \
+          mkdir -p evidencias-zap && chmod 777 evidencias-zap
+          set +e
+          docker run --rm --network atlas-network -v "$PWD/evidencias-zap:/zap/wrk:rw" zaproxy/zap-stable \
+            zap-baseline.py -t http://atlas-frontend:80 \
+            -J zap-baseline-frontend.json -r zap-baseline-frontend.html -I
+          RC_FRONT=$?
+
+          docker run --rm --network atlas-network -v "$PWD/evidencias-zap:/zap/wrk:rw" zaproxy/zap-stable \
             zap-api-scan.py -t http://atlas-backend:4000/openapi.json -f openapi -O http://atlas-backend:4000 \
             -J zap-api-backend.json -r zap-api-backend.html -I \
             -z "-config replacer.full_list(0).description=auth -config replacer.full_list(0).enabled=true \
                 -config replacer.full_list(0).matchtype=REQ_HEADER -config replacer.full_list(0).matchstr=Authorization \
                 -config replacer.full_list(0).regex=false -config replacer.full_list(0).replacement=Bearer\ $ZAP_TOKEN"
-      - name: Quality gate (bloquea Alto y Medio no aceptado)
-        run: node ev3/automatizacion/zap/zap-gate.mjs zap/zap-baseline-frontend.json zap/zap-api-backend.json
+          RC_BACK=$?
+
+          node ev3/automatizacion/zap/zap-gate.mjs \
+            evidencias-zap/zap-baseline-frontend.json \
+            evidencias-zap/zap-api-backend.json > evidencias-zap/zap-gate.txt 2>&1
+          RC_GATE=$?
+          set -e
+
+          cat evidencias-zap/zap-gate.txt
+          echo "Códigos de salida -> ZAP Front: $RC_FRONT | ZAP Back: $RC_BACK | Gate: $RC_GATE"
+          if [ "$RC_GATE" -ne 0 ]; then
+            exit 1
+          fi
+      - name: Generar resumen de evidencia
+        if: always()
+        run: |
+          node ev3/automatizacion/ci/generar-resumen.mjs zap \
+            evidencias-zap/zap-baseline-frontend.json \
+            evidencias-zap/zap-api-backend.json \
+            evidencias-zap/zap-gate.txt \
+            evidencias-zap/zap-summary.md
+          cat evidencias-zap/zap-summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: zap, path: zap/ }
+        with:
+          name: evidencia-owasp-zap
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-zap/
 
-  # ---------------------------------------------------------------- Etapa 6
-  rendimiento:
-    name: "6 · Carga y estrés (k6)"
-    needs: integracion
-    if: github.ref == 'refs/heads/main' || github.event_name == 'schedule'
+  # ==========================================================================
+  # 8 · APACHE JMETER (Carga CRUD 50u, CRUD 200u y Documentos <= 10 s)
+  # ==========================================================================
+  apache-jmeter:
+    name: "8 · Carga y Rendimiento (Apache JMeter)"
+    needs: [gitleaks, npm-audit, jest-unitarias, sonarqube]   # Etapa 2: solo si la Etapa 1 aprobó (fail-fast)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Levantar Atlas
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Cachear Apache JMeter ${{ env.JMETER_VERSION }}
+        id: cache-jmeter
+        uses: actions/cache@v4
+        with:
+          path: ~/jmeter
+          key: apache-jmeter-${{ env.JMETER_VERSION }}
+      - name: Instalar Apache JMeter ${{ env.JMETER_VERSION }} (binario oficial)
+        if: steps.cache-jmeter.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p "$HOME/jmeter"
+          curl -fSL "https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz" \
+            -o /tmp/jmeter.tgz
+          tar -xzf /tmp/jmeter.tgz -C "$HOME/jmeter"
+          rm -f /tmp/jmeter.tgz
+      - name: Generar .env efímero y levantar stack Atlas
         run: |
           echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+          printf "PORT_POSTGRES=15432\nPORT_BACKEND=4450\nPORT_FRONTEND=3350\nCOMPOSE_PROJECT_NAME=atlas\n" >> .env
           docker compose up -d --build --wait
-      - name: k6 (umbral NFR-PERF-1 p95 < 300 ms con 50 VU)
+          curl --retry 15 --retry-delay 3 --retry-all-errors -sf http://localhost:4450/
+      - name: Generar documento PDF sintético de prueba (1 MB)
         run: |
-          docker run --rm --network atlas-network -v "$PWD/ev3/automatizacion/carga:/scripts" -v "$PWD:/out" \
-            grafana/k6 run --summary-export=/out/k6-summary.json /scripts/atlas-carga.k6.js
+          mkdir -p evidencias-jmeter /tmp/jmeter-fixtures
+          node -e 'const fs=require("fs"),c=require("crypto");const h=Buffer.from("%PDF-1.4\n");fs.writeFileSync("/tmp/jmeter-fixtures/test-doc.pdf",Buffer.concat([h,c.randomBytes(1024*1024-h.length)]));'
+      - name: Ejecutar Apache JMeter (CRUD 50u, CRUD 200u y Documentos) y evaluar criterios
+        run: |
+          set +e
+          "$HOME/jmeter/apache-jmeter-${JMETER_VERSION}/bin/jmeter" -n \
+            -t ev3/automatizacion/carga/atlas-carga.jmx \
+            -JHOST=localhost \
+            -JPORT=4450 \
+            -JDOC_PATH=/tmp/jmeter-fixtures/test-doc.pdf \
+            -l evidencias-jmeter/results.jtl \
+            -j evidencias-jmeter/jmeter.log \
+            -e -o evidencias-jmeter/jmeter-report
+          RC_JM=$?
+
+          node ev3/automatizacion/carga/jmeter-gate.mjs \
+            evidencias-jmeter/results.jtl \
+            evidencias-jmeter/jmeter-summary.md \
+            evidencias-jmeter/jmeter-gate-result.json
+          RC_GATE=$?
+          set -e
+
+          echo "Códigos de salida -> JMeter: $RC_JM | Gate JMeter: $RC_GATE"
+          if [ "$RC_JM" -ne 0 ] || [ "$RC_GATE" -ne 0 ]; then
+            docker compose logs atlas-backend --tail 150 > evidencias-jmeter/backend-logs.txt 2>&1 || true
+            exit 1
+          fi
+      - name: Publicar resumen en Step Summary
+        if: always()
+        run: |
+          if [ -f evidencias-jmeter/jmeter-summary.md ]; then
+            cat evidencias-jmeter/jmeter-summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: k6, path: k6-summary.json }
+        with:
+          name: evidencia-jmeter
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-jmeter/
 
-  # ---------------------------------------------------------------- Etapa 7
-  despliegue-staging:
-    name: "7 · Despliegue a staging (aprobación manual)"
-    needs: [dast, rendimiento]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  # ==========================================================================
+  # 9 · GATE DE CALIDAD FINAL (Siempre corre; falla si >= 1 job falló)
+  # ==========================================================================
+  gate-calidad:
+    name: "9 · Gate de Calidad Final"
+    needs:
+      - gitleaks
+      - npm-audit
+      - jest-unitarias
+      - supertest-integracion
+      - selenium-e2e
+      - sonarqube
+      - owasp-zap
+      - apache-jmeter
+    if: always()
     runs-on: ubuntu-latest
-    environment:
-      name: staging            # requiere aprobacion de un revisor distinto al autor (segregacion de funciones)
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Publicar imagenes etiquetadas con el SHA del commit (trazabilidad)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Consolidar resultados y validar que todos los jobs aprobaron
+        env:
+          RES_GITLEAKS: ${{ needs.gitleaks.result }}
+          RES_NPM_AUDIT: ${{ needs.npm-audit.result }}
+          RES_JEST: ${{ needs.jest-unitarias.result }}
+          RES_SUPERTEST: ${{ needs.supertest-integracion.result }}
+          RES_SELENIUM: ${{ needs.selenium-e2e.result }}
+          RES_SONARQUBE: ${{ needs.sonarqube.result }}
+          RES_ZAP: ${{ needs.owasp-zap.result }}
+          RES_JMETER: ${{ needs.apache-jmeter.result }}
         run: |
-          # compose exige JWT_SECRET (fail-safe); en staging real vendria de un secreto del environment
-          echo "JWT_SECRET=${{ secrets.STAGING_JWT_SECRET || 'build-only-placeholder-no-se-usa-en-runtime-0000' }}" > .env
+          mkdir -p evidencias-gate
+          set +e
+          node ev3/automatizacion/ci/generar-resumen.mjs gate \
+            evidencias-gate/resumen-pipeline.md \
+            evidencias-gate/resumen-pipeline.json
+          RC=$?
+          set -e
+          cat evidencias-gate/resumen-pipeline.md >> "$GITHUB_STEP_SUMMARY"
+          exit $RC
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencia-resumen-pipeline
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-gate/
+
+  # ==========================================================================
+  # 10 · DESPLIEGUE A STAGING (Bloqueado si gate-calidad falla)
+  # ==========================================================================
+  despliegue-staging:
+    name: "10 · Despliegue a Staging (aprobación manual)"
+    needs: [gate-calidad]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: staging            # requiere aprobación manual (segregación de funciones)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir imágenes etiquetadas con el SHA del commit (trazabilidad)
+        env:
+          STAGING_JWT_SECRET: ${{ secrets.STAGING_JWT_SECRET }}
+        run: |
+          mkdir -p evidencias-staging
+          echo "JWT_SECRET=${STAGING_JWT_SECRET:-build-only-placeholder-no-se-usa-en-runtime-0000}" > .env
           docker compose build
-          echo "Imagenes atlas-backend:${GITHUB_SHA::7} y atlas-frontend:${GITHUB_SHA::7} listas para staging"
+          {
+            echo "Commit SHA: ${GITHUB_SHA}"
+            echo "Etiqueta: ${GITHUB_SHA::7}"
+            echo "Imágenes listas: atlas-backend:${GITHUB_SHA::7}, atlas-frontend:${GITHUB_SHA::7}"
+            echo "Fecha UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          } > evidencias-staging/staging-manifest.txt
+          cat evidencias-staging/staging-manifest.txt
+          cat evidencias-staging/staging-manifest.txt >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencia-staging
+          retention-days: 3
+          if-no-files-found: warn
+          path: evidencias-staging/

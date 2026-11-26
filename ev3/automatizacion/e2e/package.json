@@ -2,6 +2,9 @@
   "name": "atlas-e2e",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test --test-reporter=spec atlas-e2e.test.mjs" },
+  "scripts": {
+    "test": "node --test --test-reporter=spec atlas-e2e.test.mjs",
+    "test:ci": "node --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=e2e-junit.xml atlas-e2e.test.mjs"
+  },
   "devDependencies": { "selenium-webdriver": "^4.27.0" }
 }

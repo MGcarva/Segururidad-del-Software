@@ -382,7 +382,7 @@ switch (cmd) {
       { id: "owasp-zap", nombre: "7 · OWASP ZAP (DAST + Gate)", estado: process.env.RES_ZAP || "unknown" },
       { id: "apache-jmeter", nombre: "8 · Apache JMeter (Carga CRUD + Docs)", estado: process.env.RES_JMETER || "unknown" },
     ];
-    const icono = (st) => (st === "success" ? "✅ success" : st === "failure" ? "❌ failure" : st === "cancelled" ? "🚫 cancelled" : st === "skipped" ? "⏭️ skipped (Etapa 1 falló)" : `⚠️ ${st}`);
+    const icono = (st) => (st === "success" ? "✅ success" : st === "failure" ? "❌ failure" : st === "cancelled" ? "🚫 cancelled" : st === "skipped" ? "⏭️ skipped" : `⚠️ ${st}`);
     const fallidos = jobs.filter((j) => j.estado !== "success");
     const aprobado = fallidos.length === 0;
 

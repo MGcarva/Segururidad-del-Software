@@ -1,29 +1,24 @@
 # Pipeline DevSecOps del Sistema Atlas (Repositorio Público).
-# Arquitectura en 3 etapas encadenadas con `needs` (fail-fast + shift-left):
-#   - ETAPA 1 · Controles rápidos y baratos (en paralelo entre sí): Gitleaks,
-#     npm audit, Jest/ESLint/build y SonarQube. No levantan el stack Docker.
-#   - ETAPA 2 · Controles pesados (en paralelo entre sí): Supertest, Selenium,
-#     OWASP ZAP y JMeter. `needs` de los 4 jobs de la Etapa 1: si alguno falla,
-#     la Etapa 2 NO se ejecuta (se omite), ahorrando minutos de runner.
-#   - ETAPA 3 · `gate-calidad` (if: always()) consolida los resultados y FALLA
-#     si al menos 1 job no aprobó (un job omitido cuenta como no aprobado),
-#     bloqueando `despliegue-staging` y cualquier pipeline posterior encadenado
+# Arquitectura de ejecución independiente con Gate Final Bloqueante:
+#   - Los 8 jobs de pruebas, seguridad y carga se ejecutan en paralelo de forma
+#     independiente (sin `needs` entre ellos): el fallo de un job NO impide que
+#     se ejecuten los demás ni que se recopilen todas sus evidencias.
+#   - Dentro de cada job, todas las herramientas corren antes de fallar.
+#   - El job final `gate-calidad` (if: always()) consolida los resultados y
+#     FALLA el pipeline si al menos 1 job no aprobó, bloqueando
+#     `despliegue-staging` y cualquier pipeline posterior encadenado
 #     (`workflow_call` / `workflow_run`).
-#   - Dentro de cada job, los pasos de evidencia corren con `if: always()` y se
-#     suben como GitHub Artifact con retención de 3 días.
+#   - Cada job sube sus evidencias como GitHub Artifact con retención de 3 días.
 #
-# Etapa 1
 #  1 · Gitleaks       : Escaneo de secretos en historial git completo (--redact)
 #  2 · npm audit      : Análisis SCA de dependencias de producción (High/Critical)
 #  3 · Jest           : Pruebas unitarias + cobertura >=80% + ESLint + build front
-#  6 · SonarQube      : SAST + Quality Gate (híbrido: SonarCloud/externo o Docker efímero)
-# Etapa 2
 #  4 · Supertest      : Pruebas de integración API/BD (Jest+Supertest) + seguridad API
 #  5 · Selenium       : Selenium IDE (.side) + Selenium WebDriver POM (Chrome headless)
+#  6 · SonarQube      : SAST + Quality Gate (híbrido: SonarCloud/externo o Docker efímero)
 #  7 · OWASP ZAP      : DAST baseline frontend + API scan OpenAPI autenticado + gate
 #  8 · Apache JMeter  : Carga CRUD 50u (<300 ms), CRUD 200u (<300 ms, 5xx <1%), Docs (<=10 s)
-# Etapa 3
-#  9 · Gate Final     : Veredicto consolidado (falla si >=1 job falló u fue omitido)
+#  9 · Gate Final     : Veredicto consolidado (falla si >=1 job falló)
 # 10 · Staging        : Despliegue con aprobación manual (solo si Gate Final aprueba)
 
 name: DevSecOps Atlas
@@ -200,7 +195,6 @@ jobs:
   # ==========================================================================
   supertest-integracion:
     name: "4 · Integración API (Supertest)"
-    needs: [gitleaks, npm-audit, jest-unitarias, sonarqube]   # Etapa 2: solo si la Etapa 1 aprobó (fail-fast)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -261,7 +255,6 @@ jobs:
   # ==========================================================================
   selenium-e2e:
     name: "5 · E2E Navegador (Selenium IDE + WebDriver)"
-    needs: [gitleaks, npm-audit, jest-unitarias, sonarqube]   # Etapa 2: solo si la Etapa 1 aprobó (fail-fast)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -457,7 +450,6 @@ jobs:
   # ==========================================================================
   owasp-zap:
     name: "7 · Seguridad Dinámica (OWASP ZAP)"
-    needs: [gitleaks, npm-audit, jest-unitarias, sonarqube]   # Etapa 2: solo si la Etapa 1 aprobó (fail-fast)
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -533,7 +525,6 @@ jobs:
   # ==========================================================================
   apache-jmeter:
     name: "8 · Carga y Rendimiento (Apache JMeter)"
-    needs: [gitleaks, npm-audit, jest-unitarias, sonarqube]   # Etapa 2: solo si la Etapa 1 aprobó (fail-fast)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
